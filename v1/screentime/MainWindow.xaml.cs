@@ -26,9 +26,10 @@ public partial class MainWindow : Window
     {
         // AppDict = PreAppWorker.GetScreenTimeSave();
         InitializeComponent();
-        // worker.Worker();
+        worker.Worker();
         
-        Dictionary<String, TimeSpan> screenTime = Calculate_ScreenTime();
+        /*
+         * Dictionary<String, TimeSpan> screenTime = Calculate_ScreenTime();
         foreach (var timeSpent in screenTime)
         {
             TimeSpan svar = timeSpent.Value;
@@ -40,6 +41,7 @@ public partial class MainWindow : Window
         double[] values = kvp.Key;
         string[] labels = kvp.Value;
         Show_Chart(values, labels);
+        */
     }
     
     

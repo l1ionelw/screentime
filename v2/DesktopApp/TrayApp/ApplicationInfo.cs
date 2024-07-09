@@ -6,20 +6,25 @@ using System.Threading.Tasks;
 
 namespace TrayApp
 {
-    struct ApplicationInfo
+    public struct ApplicationInfo
     {
         public string path;
         public string fileDescription;
         public string productName;
     }
-    struct TimeRange
+    public struct TimeRange
     {
         public long startTime;
         public long endTime;
     }
-    struct ApplicationHistory
+    public struct ApplicationEntry
     {
         public ApplicationInfo appInfo;
-        public TimeRange[] timeRange;
+        public List<TimeRange> timeRange;   
+    }
+    public struct TimeEntry 
+    {
+        public string date;
+        public Dictionary<ApplicationInfo, ApplicationEntry> appEntry;
     }
 }
