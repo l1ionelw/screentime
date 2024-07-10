@@ -17,6 +17,14 @@ namespace TrayApp
         public long startTime;
         public long endTime;
     }
+
+    public struct SingleAppEntry
+    {
+        public ApplicationInfo appInfo;
+        public TimeRange timeRange;
+    }
+
+    // ---------------- Depreciated
     public struct ApplicationEntry
     {
         public ApplicationInfo appInfo;
@@ -25,6 +33,6 @@ namespace TrayApp
     public struct TimeEntry 
     {
         public string date;
-        public Dictionary<ApplicationInfo, ApplicationEntry> appEntry;
+        public Dictionary<string, ApplicationEntry> appEntry;
     }
 }

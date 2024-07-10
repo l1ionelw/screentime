@@ -1,0 +1,37 @@
+meta {
+  name: entry data validation
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3000/api/entry/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "appInfo": {
+      "name": "hello"
+    },
+    "timeRange": {
+      "startTime": 1720561337,
+      "endTime": 1720561344
+    }
+  }
+}
+
+body:text {
+  {
+    "appInfo": {
+      "path": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\devenv.exe",
+      "fileDescription": "Microsoft Visual Studio 2022",
+      "productName": "Microsoft® Visual Studio®"
+    },
+    "timeRange": {
+      "startTime": 1720561337,
+      "endTime": 1720561344
+    }
+  }
+}

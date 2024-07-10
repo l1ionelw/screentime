@@ -6,6 +6,11 @@ using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using RestWrapper;
+using System.IO;
+using System.Net.Http;
+using Flurl.Http;
 
 namespace TrayApp
 {
@@ -30,10 +35,10 @@ namespace TrayApp
         #region debug 
         public void printEntryStore(TimeEntry timeEntry)
         {
-            foreach (KeyValuePair<ApplicationInfo, ApplicationEntry> entry in timeEntry.appEntry)
+            foreach (KeyValuePair<string, ApplicationEntry> entry in timeEntry.appEntry)
             {
                 // Console.WriteLine(entry.Key.path);
-                Console.WriteLine(entry.Key.fileDescription);
+                Console.WriteLine(entry.Key);
                 // Console.WriteLine(entry.Key.productName);
                 foreach (TimeRange timerange in entry.Value.timeRange)
                 {
@@ -45,50 +50,53 @@ namespace TrayApp
 
         #region callback
 
-        TimeEntry timeEntryMainStore;
-
+        ApplicationInfo appinfo = WindowManager.getWindowTitle();
         long startTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         long endTime;
         public void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
             Console.WriteLine("Window title changed");
-            ApplicationInfo appinfo = WindowManager.getWindowTitle();
             Console.WriteLine(appinfo.path);
             Console.WriteLine(appinfo.fileDescription);
             endTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             ModifyTimeObject(appinfo, startTime, endTime);
             startTime = endTime;
+            appinfo = WindowManager.getWindowTitle();
         }
-        public void ModifyTimeObject(ApplicationInfo appInfo, long appLaunch, long appAway)
-        {
-            ApplicationEntry appEntry; 
+        public async void ModifyTimeObject(ApplicationInfo appInfo, long appLaunch, long appAway)
+        { 
+            ApplicationInfo thisAppInfo = new ApplicationInfo();
+            thisAppInfo = appInfo;
+
             TimeRange thisTimeRange = new TimeRange();
             thisTimeRange.startTime = appLaunch;
             thisTimeRange.endTime = appAway;
-            Console.WriteLine(timeEntryMainStore.appEntry);
 
-            if (!timeEntryMainStore.appEntry.TryGetValue(appInfo, out appEntry))
+            SingleAppEntry singleAppEntry = new SingleAppEntry();
+            singleAppEntry.appInfo = appInfo;
+            singleAppEntry.timeRange = thisTimeRange;
+
+            // string jsonData = JsonConvert.SerializeObject(singleAppEntry);
+            string jsonAppInfo = JsonConvert.SerializeObject(appInfo);
+            string jsonTimeRange = JsonConvert.SerializeObject(thisTimeRange);
+            try
             {
-                // if this app doesnt exist in main time entry
-                // then init an empty app entry and add into main store
-                Console.WriteLine("app does not exist in current dict");
-                appEntry = new ApplicationEntry();
-                appEntry.appInfo = appInfo;
-                appEntry.timeRange = new List<TimeRange>();
-                timeEntryMainStore.appEntry.Add(appInfo, appEntry);
+                //var result = await "http://localhost:3000/api/entry/".PostJsonAsync(new {data= jsonData });
+                var result = await "http://localhost:3000/api/entry/".PostJsonAsync(new {appInfo=jsonAppInfo, timeRange=jsonTimeRange});
+            } catch (FlurlHttpException ex) {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StatusCode);
             }
-            appEntry.timeRange.Add(thisTimeRange);
-            timeEntryMainStore.appEntry[appInfo] = appEntry;
-            printEntryStore(timeEntryMainStore);
-
         }
         #endregion
         public WinhookHandler()
         {
+            /*
             timeEntryMainStore = new TimeEntry();
             timeEntryMainStore.date = DateTime.Now.ToString("M/d/yyyy");
-            timeEntryMainStore.appEntry = new Dictionary<ApplicationInfo, ApplicationEntry>();
+            timeEntryMainStore.appEntry = new Dictionary<string, ApplicationEntry>();
             Console.WriteLine(timeEntryMainStore.appEntry);
+            */
 
             Console.WriteLine("Starting window hook");
             dele = new WinEventDelegate(WinEventProc);
