@@ -43,4 +43,8 @@ router.post("/entry/", (req, res) => {
     return res.send("Success");
 })
 
+router.post("/history/get/", (req, res)=> {
+    
+})
+
 module.exports = router

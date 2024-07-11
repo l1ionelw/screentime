@@ -3,16 +3,26 @@ import timedStorageWriter from "./pre-init/timedStorageWriter";
 const router = require("./api");
 const logger = require('morgan');
 import express from "express";
+import {JSON_FILE_DIR, JSON_FILE_PATH} from "./globals";
+import checkJsonFileDate from "./pre-init/checkJsonFileDate";
+const cors = require('cors');
 
 const app = express();
-const PORT = 3000;
+const PORT = 5000;
 
 app.use(logger("dev"));
+app.use(cors());
 app.use(express.json());
 app.use("/api", router);
 
 console.log("initialize timed storage writer");
+console.log(JSON_FILE_PATH);
+console.log(JSON_FILE_DIR);
+
+checkJsonFileDate();
 timedStorageWriter();
+
+app.use("/assets", express.static("assets"));
 
 app.get("/", (req, res) => {
     console.log("hello")

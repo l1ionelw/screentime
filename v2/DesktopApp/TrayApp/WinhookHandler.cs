@@ -81,8 +81,8 @@ namespace TrayApp
             string jsonTimeRange = JsonConvert.SerializeObject(thisTimeRange);
             try
             {
-                //var result = await "http://localhost:3000/api/entry/".PostJsonAsync(new {data= jsonData });
-                var result = await "http://localhost:3000/api/entry/".PostJsonAsync(new {appInfo=jsonAppInfo, timeRange=jsonTimeRange});
+                //var result = await "http://localhost:5000/api/entry/".PostJsonAsync(new {data= jsonData });
+                var result = await "http://localhost:5000/api/entry/".PostJsonAsync(new {appInfo=jsonAppInfo, timeRange=jsonTimeRange});
             } catch (FlurlHttpException ex) {
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StatusCode);
