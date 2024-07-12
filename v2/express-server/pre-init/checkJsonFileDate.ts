@@ -5,7 +5,7 @@ import getCurrentIsoDate from "./getCurrentIsoDate";
 import writeToFile from "./writeToFile";
 import path from "path";
 
-// this is only run on app init
+// this is only run on app init. assumes the current.json is the most updated json and the mainAppstore is empty
 
 export default function checkJsonFileDate() {
     console.log("checking json file dates");

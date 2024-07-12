@@ -4,6 +4,7 @@ import getCurrentIsoDate from "./getCurrentIsoDate";
 import {RecordsStore} from "../interfaces";
 import {DateTime} from "luxon";
 
+// checks if json date is today, then sets global json values as this array. Used on server initialization in globals.ts
 export default function loadJson() {
     console.log("Loading json from file");
     // default empty store

@@ -2,6 +2,7 @@ import express from "express";
 import {JSON_FILE_PATH, mainAppStore, setWindowSwitches, windowSwitches} from "./globals";
 import type {ApplicationInfo, TimeRange} from "./interfaces";
 import writeToFile from "./pre-init/writeToFile";
+import checkAndWriteFile from "./pre-init/checkAndWriteFIle";
 
 const router = express.Router();
 router.get("/", (req, res) => {
@@ -35,7 +36,7 @@ router.post("/entry/", (req, res) => {
     mainAppStore.entries[appInfo.path] = appEntry;
 
     if (windowSwitches >= 5) {
-        writeToFile(JSON_FILE_PATH, JSON.stringify(mainAppStore));
+        checkAndWriteFile();
         setWindowSwitches(0);
     }
     console.log("\n\n\n\n\n\n\n\n\n\n");
@@ -44,7 +45,7 @@ router.post("/entry/", (req, res) => {
 })
 
 router.post("/history/get/", (req, res)=> {
-    
+
 })
 
 module.exports = router
