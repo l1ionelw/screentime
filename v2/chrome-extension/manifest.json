@@ -1,15 +1,13 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Screentime",
   "description": "Screentime chrome extension for web tracking",
   "version": "1.0",
+  "background": {
+    "service_worker": "background.js"
+  },
   "permissions": [
     "tabs",
-    "activeTab"
-  ],
-  "background": {
-    "scripts": [
-      "background.js"
-    ]
-  }
+    "storage"
+  ]
 }

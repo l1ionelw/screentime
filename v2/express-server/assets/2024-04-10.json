@@ -1,0 +1,188 @@
+{
+    "date": "2024-04-10",
+    "entries": {
+        "C:\\Program Files\\JetBrains\\WebStorm 2023.1.5\\bin\\webstorm64.exe": {
+            "appInfo": {
+                "path": "C:\\Program Files\\JetBrains\\WebStorm 2023.1.5\\bin\\webstorm64.exe",
+                "fileDescription": "",
+                "productName": ""
+            },
+            "records": [
+                {
+                    "startTime": 1720641322,
+                    "endTime": 1720641324
+                }
+            ]
+        },
+        "C:\\Windows\\explorer.exe": {
+            "appInfo": {
+                "path": "C:\\Windows\\explorer.exe",
+                "fileDescription": "Windows Explorer",
+                "productName": "Microsoft® Windows® Operating System"
+            },
+            "records": [
+                {
+                    "startTime": 1720641324,
+                    "endTime": 1720641324
+                },
+                {
+                    "startTime": 1720641324,
+                    "endTime": 1720641325
+                },
+                {
+                    "startTime": 1720641325,
+                    "endTime": 1720641325
+                },
+                {
+                    "startTime": 1720641325,
+                    "endTime": 1720641325
+                },
+                {
+                    "startTime": 1720641320,
+                    "endTime": 1720641322
+                },
+                {
+                    "startTime": 1720641325,
+                    "endTime": 1720641328
+                },
+                {
+                    "startTime": 1720641360,
+                    "endTime": 1720641361
+                },
+                {
+                    "startTime": 1720641377,
+                    "endTime": 1720641381
+                },
+                {
+                    "startTime": 1720641381,
+                    "endTime": 1720641386
+                },
+                {
+                    "startTime": 1720641386,
+                    "endTime": 1720641386
+                },
+                {
+                    "startTime": 1720641386,
+                    "endTime": 1720641388
+                },
+                {
+                    "startTime": 1720641388,
+                    "endTime": 1720641388
+                },
+                {
+                    "startTime": 1720641389,
+                    "endTime": 1720641390
+                }
+            ]
+        },
+        "C:\\Users\\yiche\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe": {
+            "appInfo": {
+                "path": "C:\\Users\\yiche\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe",
+                "fileDescription": "Visual Studio Code",
+                "productName": "Visual Studio Code"
+            },
+            "records": [
+                {
+                    "startTime": 1720641328,
+                    "endTime": 1720641360
+                },
+                {
+                    "startTime": 1720641361,
+                    "endTime": 1720641373
+                },
+                {
+                    "startTime": 1720641374,
+                    "endTime": 1720641376
+                }
+            ]
+        },
+        "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe": {
+            "appInfo": {
+                "path": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+                "fileDescription": "Google Chrome",
+                "productName": "Google Chrome"
+            },
+            "records": [
+                {
+                    "startTime": 1720641373,
+                    "endTime": 1720641374
+                },
+                {
+                    "startTime": 1720641376,
+                    "endTime": 1720641377
+                },
+                {
+                    "startTime": 1720641390,
+                    "endTime": 1720641391
+                },
+                {
+                    "startTime": 1720641391,
+                    "endTime": 1720641392
+                },
+                {
+                    "startTime": 1720641392,
+                    "endTime": 1720641392
+                },
+                {
+                    "startTime": 1720641393,
+                    "endTime": 1720641394
+                },
+                {
+                    "startTime": 1720641396,
+                    "endTime": 1720641396
+                }
+            ]
+        },
+        "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\devenv.exe": {
+            "appInfo": {
+                "path": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\devenv.exe",
+                "fileDescription": "Microsoft Visual Studio 2022",
+                "productName": "Microsoft® Visual Studio®"
+            },
+            "records": [
+                {
+                    "startTime": 1720641388,
+                    "endTime": 1720641389
+                }
+            ]
+        },
+        "C:\\Program Files\\PowerToys\\PowerToys.PowerLauncher.exe": {
+            "appInfo": {
+                "path": "C:\\Program Files\\PowerToys\\PowerToys.PowerLauncher.exe",
+                "fileDescription": "PowerToys.Run",
+                "productName": "PowerToys.PowerLauncher"
+            },
+            "records": [
+                {
+                    "startTime": 1720641392,
+                    "endTime": 1720641393
+                }
+            ]
+        },
+        "C:\\Program Files\\Mozilla Firefox\\firefox.exe": {
+            "appInfo": {
+                "path": "C:\\Program Files\\Mozilla Firefox\\firefox.exe",
+                "fileDescription": "Firefox",
+                "productName": "Firefox"
+            },
+            "records": [
+                {
+                    "startTime": 1720641394,
+                    "endTime": 1720641394
+                },
+                {
+                    "startTime": 1720641394,
+                    "endTime": 1720641395
+                },
+                {
+                    "startTime": 1720641395,
+                    "endTime": 1720641396
+                },
+                {
+                    "startTime": 1720641396,
+                    "endTime": 1720641397
+                }
+            ]
+        }
+    }
+}

@@ -11,6 +11,7 @@ using RestWrapper;
 using System.IO;
 using System.Net.Http;
 using Flurl.Http;
+using Microsoft.Win32;
 
 namespace TrayApp
 {
@@ -53,6 +54,27 @@ namespace TrayApp
         ApplicationInfo appinfo = WindowManager.getWindowTitle();
         long startTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         long endTime;
+
+        private void OnPowerChange(object s, PowerModeChangedEventArgs e)
+        {
+            Console.WriteLine(e.Mode);
+
+            switch (e.Mode)
+            {
+                case PowerModes.Suspend:
+                    Console.WriteLine("Went to sleep");
+                    endTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                    ModifyTimeObject(appinfo, startTime, endTime);
+                    startTime = endTime;
+                    appinfo = new ApplicationInfo();
+                    appinfo.path = "WINDOWS_SLEEP";
+                    appinfo.fileDescription = "WINDOWS_SLEEP";
+                    appinfo.productName = "WINDOWS_SLEEP";
+                    break;
+            }
+        }
+
+
         public void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
             Console.WriteLine("Window title changed");
@@ -82,7 +104,7 @@ namespace TrayApp
             try
             {
                 //var result = await "http://localhost:5000/api/entry/".PostJsonAsync(new {data= jsonData });
-                var result = await "http://localhost:5000/api/entry/".PostJsonAsync(new {appInfo=jsonAppInfo, timeRange=jsonTimeRange});
+                var result = await "http://localhost:52879/api/entry/".PostJsonAsync(new {appInfo=jsonAppInfo, timeRange=jsonTimeRange});
             } catch (FlurlHttpException ex) {
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StatusCode);
@@ -101,6 +123,7 @@ namespace TrayApp
             Console.WriteLine("Starting window hook");
             dele = new WinEventDelegate(WinEventProc);
             IntPtr m_hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, dele, 0, 0, WINEVENT_OUTOFCONTEXT);
+            SystemEvents.PowerModeChanged += OnPowerChange;
         }
     }
 }

@@ -4,7 +4,7 @@ import App from './App.tsx'
 import './index.css'
 import {ThemeProvider} from "./components/theme-provider.tsx";
 
-export const API_URL = "http://localhost:5000"
+export const API_URL = "http://localhost:52879"
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>

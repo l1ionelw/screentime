@@ -12,14 +12,13 @@ router.get("/", (req, res) => {
 router.post("/entry/", (req, res) => {
     setWindowSwitches(windowSwitches + 1);
     let body;
-    console.log(req.body);
     try {
         body = typeof req.body === "object" ? req.body : JSON.parse(req.body);
     } catch (e) {
         return res.status(409).send("Unable to parse data.");
     }
-    const timeRange: TimeRange = JSON.parse(body["timeRange"]);
-    const appInfo: ApplicationInfo = JSON.parse(body["appInfo"]);
+    const timeRange: TimeRange = typeof body["timeRange"] !== "object" ? JSON.parse(body["timeRange"]) : body["timeRange"];
+    const appInfo: ApplicationInfo = typeof body["appInfo"] !== "object" ? JSON.parse(body["appInfo"]) : body["appInfo"];
     // null check
     if (!appInfo || !timeRange) {
         return res.status(409).send("Incorrect data format");
@@ -39,12 +38,12 @@ router.post("/entry/", (req, res) => {
         checkAndWriteFile();
         setWindowSwitches(0);
     }
-    console.log("\n\n\n\n\n\n\n\n\n\n");
-    console.log(appEntry);
+    console.log("\n\n\n");
+    console.log(appEntry.appInfo);
     return res.send("Success");
 })
 
-router.post("/history/get/", (req, res)=> {
+router.post("/history/get/", (req, res) => {
 
 })
 

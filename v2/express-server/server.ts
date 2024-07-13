@@ -8,14 +8,13 @@ import checkJsonFileDate from "./pre-init/checkJsonFileDate";
 const cors = require('cors');
 
 const app = express();
-const PORT = 5000;
+const PORT = 52879;
 
 app.use(logger("dev"));
 app.use(cors());
 app.use(express.json());
 app.use("/api", router);
 
-console.log("initialize timed storage writer");
 console.log(JSON_FILE_PATH);
 console.log(JSON_FILE_DIR);
 
