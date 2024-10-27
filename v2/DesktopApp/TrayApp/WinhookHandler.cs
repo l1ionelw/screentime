@@ -17,6 +17,8 @@ namespace TrayApp
 {
     public class WinhookHandler
     {
+        static FileLogger appLogger = new FileLogger("log.txt");
+
         #region imports 
         WinEventDelegate dele = null;
         delegate void WinEventDelegate(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
@@ -50,6 +52,9 @@ namespace TrayApp
         #endregion
 
         #region callback
+        static string[] args = Environment.GetCommandLineArgs();
+        static string port = args.Length > 1 ? args[1] : "5000";
+        string API_URL = "http://localhost:" + port + "/api/entry/";
 
         ApplicationInfo appinfo = WindowManager.getWindowTitle();
         long startTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -104,7 +109,7 @@ namespace TrayApp
             try
             {
                 //var result = await "http://localhost:5000/api/entry/".PostJsonAsync(new {data= jsonData });
-                var result = await "http://localhost:52879/api/entry/".PostJsonAsync(new {appInfo=jsonAppInfo, timeRange=jsonTimeRange});
+                var result = await API_URL.PostJsonAsync(new {appInfo=jsonAppInfo, timeRange=jsonTimeRange});
             } catch (FlurlHttpException ex) {
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StatusCode);
@@ -119,8 +124,15 @@ namespace TrayApp
             timeEntryMainStore.appEntry = new Dictionary<string, ApplicationEntry>();
             Console.WriteLine(timeEntryMainStore.appEntry);
             */
+            appLogger.log("Window hook initialized");
+            appLogger.log("Application arguments");
+            appLogger.log(args.ToString());
 
-            Console.WriteLine("Starting window hook");
+            appLogger.log("Parsed port");
+            appLogger.log(port.ToString());
+
+            appLogger.log("Final constructed api url");
+            appLogger.log(API_URL);
             dele = new WinEventDelegate(WinEventProc);
             IntPtr m_hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, dele, 0, 0, WINEVENT_OUTOFCONTEXT);
             SystemEvents.PowerModeChanged += OnPowerChange;

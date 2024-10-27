@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 console.log(__dirname);
 export default defineConfig({
   server: {
-    port: 50714
+    port: 3000
   },
   plugins: [react()],
   resolve: {

@@ -26,6 +26,9 @@ bld/
 [Oo]bj/
 [Ll]og/
 
+/v2/express-server/assets
+v2/ServiceDiscoverer/packages/
+
 # Visual Studio cache/options directory
 .vs/
 .vscode/
@@ -48,3 +51,8 @@ TestResult.xml
 [Dd]ebugPS/
 [Rr]eleasePS/
 dlldata.c
+
+
+node_modules
+
+

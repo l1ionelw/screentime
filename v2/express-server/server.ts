@@ -8,8 +8,10 @@ import checkJsonFileDate from "./pre-init/checkJsonFileDate";
 const cors = require('cors');
 
 const app = express();
-const PORT = 52879;
-
+let PORT = parseInt(process.argv[2]?.replace("--port=", ""));
+if (PORT === undefined || !PORT) {
+    PORT = 5000
+}
 app.use(logger("dev"));
 app.use(cors());
 app.use(express.json());

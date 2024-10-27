@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -10,6 +11,7 @@ namespace TrayApp
 {
     public class TrayApplicationContext : ApplicationContext
     {
+        static FileLogger appLogger = new FileLogger("log.txt");
         private NotifyIcon trayIcon;
 
         public TrayApplicationContext()
@@ -23,7 +25,9 @@ namespace TrayApp
                 },
                 Visible = true
             };
+            appLogger.log("Application init");
             new WinhookHandler();
+            
         }
 
         void Exit(object? sender, EventArgs e)

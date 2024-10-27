@@ -12,8 +12,9 @@ namespace TrayApp
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
+            Application.EnableVisualStyles();
             Console.WriteLine("Trayapp is starting");
             Application.Run(new TrayApplicationContext());
         }
