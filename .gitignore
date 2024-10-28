@@ -28,6 +28,7 @@ bld/
 
 /v2/express-server/assets
 v2/ServiceDiscoverer/packages/
+v3/TrayApp/packages/
 
 # Visual Studio cache/options directory
 .vs/
