@@ -12,10 +12,6 @@ namespace TrayApp
         public string path;
         public string fileDescription;
         public string productName;
-        public override string ToString()
-        {
-            return $"{path}|||||{fileDescription}|||||{productName}";
-        }
     }
     public struct TimeRange
     {
@@ -28,7 +24,8 @@ namespace TrayApp
         public int day;
         public int month;
         public int year;
-        public Dictionary<ApplicationInfo, List<TimeRange>> screenTimeData;
+        public Dictionary<string, List<TimeRange>> screenTimeData; // key = app path, value = list of timerange
+        public Dictionary<string, ApplicationInfo> appInfoPairs; // app path to app info 
     }
 
 }

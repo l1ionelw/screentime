@@ -40,7 +40,9 @@ namespace TrayApp
 
         #region callback
         // initialize whole app screentimedata
-        Dictionary<ApplicationInfo, List<TimeRange>> screenTimeData = new Dictionary<ApplicationInfo, List<TimeRange>>();
+        static DateTime rightNow = DateTime.Now;
+        ScreenTimeData screenTimeData = new ScreenTimeData() { appInfoPairs=new Dictionary<string, ApplicationInfo>(), screenTimeData = new Dictionary<string, List<TimeRange>>(), day = rightNow.Day, month=rightNow.Month, year=rightNow.Year };
+        //Dictionary<ApplicationInfo, List<TimeRange>> screenTimeData = new Dictionary<ApplicationInfo, List<TimeRange>>();
         int windowsSwitched = 0;
 
         // init json serializer
@@ -62,16 +64,27 @@ namespace TrayApp
             ApplicationInfo thisAppInfo = new ApplicationInfo() { path = appinfo.path, fileDescription = appinfo.fileDescription, productName = appinfo.productName };
             TimeRange appDuration = new TimeRange() { startTime = startTime, endTime = endTime };
 
+            if (appinfo.path==null)
+            {
+                appinfo.path = "UNKNOWN APP";
+            }
             // add to screentimedata 
-            if (screenTimeData.ContainsKey(appinfo)) {
+            if (screenTimeData.screenTimeData.ContainsKey(appinfo.path)) {
                 appLogger.log("Dict already contains app, appending to it!");
-                screenTimeData[appinfo].Add(appDuration);
+                screenTimeData.screenTimeData[appinfo.path].Add(appDuration);
             } else
             {
                 appLogger.log("Dict DOESNT contain app. Creating new entry");
                 List<TimeRange> toInsert = new List<TimeRange>();
                 toInsert.Add(appDuration);
-                screenTimeData.Add(appinfo, toInsert);
+                screenTimeData.screenTimeData.Add(appinfo.path, toInsert);
+            }
+
+            // add to apppairs
+            if (!screenTimeData.appInfoPairs.ContainsKey(appinfo.path))
+            {
+                appLogger.log("appinfopairs doesnt have this app, adding it");
+                screenTimeData.appInfoPairs.Add(appinfo.path, thisAppInfo);
             }
 
             // TODO: turn whole screentimedata into a json and write it ASYNC

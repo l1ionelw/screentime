@@ -14,8 +14,16 @@ namespace TrayApp
         [STAThread]
         static void Main(string[] args)
         {
+            
             Application.EnableVisualStyles();
             Console.WriteLine("Trayapp is starting");
+            PreAppHandler preAppHandler = new PreAppHandler();
+            ScreenTimeData screenTimeData = preAppHandler.getAndParseFileContents();
+            bool fileToday = preAppHandler.isFileToday(screenTimeData);
+            if (!fileToday)
+            {
+                preAppHandler.moveOldRecord(screenTimeData.day, screenTimeData.month, screenTimeData.year);
+            }
             Application.Run(new TrayApplicationContext());
         }
     }
