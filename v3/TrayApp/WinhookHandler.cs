@@ -97,15 +97,6 @@ namespace TrayApp
                 appLogger.log("5 or more windows switched, writing to file!");
                 string jsonString = JsonConvert.SerializeObject(screenTimeData);
                 WriteToFileAsync("current.json", jsonString);
-                bool stillToday = appHandler.isFileToday(screenTimeData);
-                if (!stillToday)
-                {
-                    appHandler.moveOldRecord(screenTimeData.day, screenTimeData.month, screenTimeData.year);
-                    DateTime rightNow = DateTime.Now;
-                    screenTimeData = new ScreenTimeData() { appInfoPairs = new Dictionary<string, ApplicationInfo>(), screenTimeData = new Dictionary<string, List<TimeRange>>(), day = rightNow.Day, month = rightNow.Month, year = rightNow.Year };
-                    windowsSwitched = 0;
-                    return;
-                }
             }
 
             // update times
@@ -115,7 +106,7 @@ namespace TrayApp
 
         }
 
-        public static async Task WriteToFileAsync(string path, string value)
+        public async Task WriteToFileAsync(string path, string value)
         {
             try
             {
@@ -126,6 +117,15 @@ namespace TrayApp
 
                 Console.WriteLine("Write to file successful!");
                 appLogger.log("Write to file successful!");
+                bool stillToday = appHandler.isFileToday(screenTimeData);
+                if (!stillToday)
+                {
+                    appHandler.moveOldRecord(screenTimeData.day, screenTimeData.month, screenTimeData.year);
+                    DateTime rightNow = DateTime.Now;
+                    screenTimeData = new ScreenTimeData() { appInfoPairs = new Dictionary<string, ApplicationInfo>(), screenTimeData = new Dictionary<string, List<TimeRange>>(), day = rightNow.Day, month = rightNow.Month, year = rightNow.Year };
+                    windowsSwitched = 0;
+                    return;
+                }
             }
             catch (Exception ex)
             {
