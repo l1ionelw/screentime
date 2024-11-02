@@ -15,12 +15,16 @@ namespace TrayApp
         public ScreenTimeData getAndParseFileContents()
         {
             string currentJsonText = readFromFile("current.json");
-            if (currentJsonText == null) { return new ScreenTimeData() { day = 0, month = 0, year = 0 }; }
+            if (currentJsonText == "" || currentJsonText == null) { return new ScreenTimeData() { day = 0, month = 0, year = 0 }; }
             ScreenTimeData dataToCheck = JsonConvert.DeserializeObject<ScreenTimeData>(currentJsonText);
             return dataToCheck;
         }
         public bool isFileToday(ScreenTimeData dataToCheck)
         {
+            if (dataToCheck.year == 0)
+            {
+                return true;
+            }
             DateTime rightNow = DateTime.Now;
             if (rightNow.Day != dataToCheck.day || rightNow.Month != dataToCheck.month || rightNow.Year != dataToCheck.year)
             {
