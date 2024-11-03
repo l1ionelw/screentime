@@ -33,14 +33,13 @@ let tabChanges = 0;
 // pre app worker
 let screenTimeData;
 try {
-    screenTimeData = readFileSync(CURRENT_SCREENTIME_DATA_FILE_NAME)
+    screenTimeData = readFileSync(CURRENT_SCREENTIME_DATA_FILE_NAME, "utf8")
 } catch (e) {
     logMessage(`An error occurred reading from ${CURRENT_SCREENTIME_DATA_FILE_NAME}`);
     logMessage(e.message);
 }
-
 // null check, if exists, continue validation
-if (screenTimeData) {
+if (screenTimeData !== "") {
     logMessage("current json is NOT empty, validating date")
     screenTimeData = JSON.parse(screenTimeData);
     // is today, set storage

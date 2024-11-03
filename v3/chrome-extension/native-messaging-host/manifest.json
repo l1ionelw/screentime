@@ -1,0 +1,10 @@
+{
+    "name": "com.screentime.port",
+    "description": "My Native Messaging Host",
+    "path": "C:\\Users\\yiche\\Documents\\GitHub\\screentime\\v3\\chrome-extension\\native-messaging-host\\bin\\Debug\\native-messaging-host.exe",
+    "type": "stdio",
+    "allowed_origins": [
+      "chrome-extension://ccajjfgdplbgakojnhgodjpccjdnblpg/"
+    ]
+  }
+  
