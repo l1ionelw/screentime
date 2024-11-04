@@ -1,3 +1,0 @@
-[10-2 22:34] current json is NOT empty, validating date
-[10-2 22:34] Current json is empty, or different day, using default key value store
-[10-2 22:34] CURRENT VALUE STORE: {"day":2,"month":11,"year":2024,"screenTimeData":{}}

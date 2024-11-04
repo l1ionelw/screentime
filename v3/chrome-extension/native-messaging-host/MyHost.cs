@@ -13,8 +13,10 @@ namespace NativeMessagingHost
     public class MyHost : Host
     {
         private const bool SendConfirmationReceipt = true;
+        
         FileLogger appLogger = new FileLogger("log.txt");
-        static string PORT_FILE_PATH = "C:\\Users\\yiche\\Documents\\GitHub\\screentime\\v3\\chrome-extension\\express-webserver\\port.txt";
+        static string PORT_FILE_PATH = Path.Combine(ReadFile("server_path.txt"),"port.txt");
+        //static string PORT_FILE_PATH = "C:\\Users\\yiche\\Documents\\GitHub\\screentime\\v3\\chrome-extension\\express-webserver\\port.txt";
         string port = ReadFile(PORT_FILE_PATH);
 
         public override string Hostname
@@ -37,6 +39,7 @@ namespace NativeMessagingHost
         }
         public static string ReadFile(string filePath)
         {
+            FileLogger appLogger = new FileLogger("log.txt");
             try
             {
                 // Read the contents of the file synchronously
@@ -46,6 +49,7 @@ namespace NativeMessagingHost
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred: {ex.Message}");
+                appLogger.log(ex.Message);
                 return null;
             }
         }

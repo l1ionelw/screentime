@@ -1,0 +1,29 @@
+[10-2 22:34] current json is NOT empty, validating date
+[10-2 22:34] Current json is empty, or different day, using default key value store
+[10-2 22:34] CURRENT VALUE STORE: {"day":2,"month":11,"year":2024,"screenTimeData":{}}
+[10-3 13:41] Current json is empty, or different day, using default key value store
+[10-3 13:41] CURRENT VALUE STORE: {"day":3,"month":11,"year":2024,"tabHistory":{},"appHistory":{},"tabPairs":{},"appPairs":{}}
+[10-3 20:56] Current json is empty, or different day, using default key value store
+[10-3 20:56] CURRENT VALUE STORE: {"day":3,"month":11,"year":2024,"tabHistory":{},"appHistory":{},"tabPairs":{},"appPairs":{}}
+[10-3 21:33] Current json is empty, or different day, using default key value store
+[10-3 21:33] CURRENT VALUE STORE: {"day":3,"month":11,"year":2024,"tabHistory":{},"appHistory":{},"tabPairs":{},"appPairs":{}}
+[10-3 21:36] Current json is empty, or different day, using default key value store
+[10-3 21:36] CURRENT VALUE STORE: {"day":3,"month":11,"year":2024,"tabHistory":{},"appHistory":{},"tabPairs":{},"appPairs":{}}
+[10-3 21:38] Current json is empty, or different day, using default key value store
+[10-3 21:38] CURRENT VALUE STORE: {"day":3,"month":11,"year":2024,"tabHistory":{},"appHistory":{},"tabPairs":{},"appPairs":{}}
+[10-3 21:39] Current json is empty, or different day, using default key value store
+[10-3 21:39] CURRENT VALUE STORE: {"day":3,"month":11,"year":2024,"tabHistory":{},"appHistory":{},"tabPairs":{},"appPairs":{}}
+[10-3 21:41] Current json is empty, or different day, using default key value store
+[10-3 21:41] CURRENT VALUE STORE: {"day":3,"month":11,"year":2024,"tabHistory":{},"appHistory":{},"tabPairs":{},"appPairs":{}}
+[10-3 21:42] Current json is empty, or different day, using default key value store
+[10-3 21:42] CURRENT VALUE STORE: {"day":3,"month":11,"year":2024,"tabHistory":{},"appHistory":{},"tabPairs":{},"appPairs":{}}
+[10-3 21:46] Current json is empty, or different day, using default key value store
+[10-3 21:46] CURRENT VALUE STORE: {"day":3,"month":11,"year":2024,"tabHistory":{},"appHistory":{},"tabPairs":{},"appPairs":{}}
+[10-3 21:46] Current json is empty, or different day, using default key value store
+[10-3 21:46] CURRENT VALUE STORE: {"day":3,"month":11,"year":2024,"tabHistory":{},"appHistory":{},"tabPairs":{},"appPairs":{}}
+[10-3 21:51] Current json is empty, or different day, using default key value store
+[10-3 21:51] CURRENT VALUE STORE: {"day":3,"month":11,"year":2024,"tabHistory":{},"appHistory":{},"tabPairs":{},"appPairs":{}}
+[10-3 21:51] Current json is empty, or different day, using default key value store
+[10-3 21:51] CURRENT VALUE STORE: {"day":3,"month":11,"year":2024,"tabHistory":{},"appHistory":{},"tabPairs":{},"appPairs":{}}
+[10-3 21:51] Current json is empty, or different day, using default key value store
+[10-3 21:51] CURRENT VALUE STORE: {"day":3,"month":11,"year":2024,"tabHistory":{},"appHistory":{},"tabPairs":{},"appPairs":{}}
