@@ -10,14 +10,16 @@ using Newtonsoft.Json;
 using RestWrapper;
 using System.IO;
 using System.Net.Http;
-using Flurl.Http;
 using Microsoft.Win32;
+using Newtonsoft.Json.Linq;
+using System.Security.Policy;
 
 namespace TrayApp
 {
     public class WinhookHandler
     {
         static FileLogger appLogger = new FileLogger("log.txt");
+        private static readonly HttpClient client = new HttpClient();
 
         #region imports 
         WinEventDelegate dele = null;
@@ -37,20 +39,44 @@ namespace TrayApp
         #endregion
 
         #region callback
-        string API_URL = "http://localhost:3000/";
+        string API_URL = "http://localhost:5057/new/appchange/";
         ApplicationInfo appinfo = WindowManager.getWindowTitle();
         long startTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         long endTime;
 
 
-        public void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
+        public async void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
+            endTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             Console.WriteLine("Window title changed");
             // generate data for previous app
             ApplicationInfo applicationInfo = new ApplicationInfo() { fileDescription=appinfo.fileDescription, path=appinfo.path,  productName=appinfo.productName};
             JsonPostData postData = new JsonPostData() { appInfo=applicationInfo, appPath=appinfo.path, endTime=endTime, startTime=startTime };
             // new app and tab times
-            endTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            string output = JsonConvert.SerializeObject(postData);
+            // if less than 3 then skip 
+            if (endTime - startTime > 3)
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    // Prepare the content
+                    StringContent content = new StringContent(output, Encoding.UTF8, "application/json");
+
+                    try
+                    {
+                        // Make the POST request asynchronously
+                        HttpResponseMessage response = await client.PostAsync(API_URL, content);
+
+                        // Read and print the response content
+                        string responseContent = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine($"Response: {responseContent}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error: {ex.Message}");
+                    }
+                }
+            }
             startTime = endTime;
             appinfo = WindowManager.getWindowTitle();
         }

@@ -8,7 +8,7 @@ app.use(express.json());
 
 const LOG_FILE_NAME = "log.txt";
 const CURRENT_SCREENTIME_DATA_FILE_NAME = "current.json";
-const TAB_CHANGE_THRESHOLD = 1;
+const TAB_CHANGE_THRESHOLD = 5;
 const APP_CHANGE_THRESHOLD = 10;
 
 function logMessage(message) {
@@ -128,9 +128,10 @@ app.post("/new/appchange/", (req, res) => {
     const endTime = req.body.endTime;
     const appPath = req.body.appPath // string app path 
     const appInfo = req.body.appInfo // json of app info
-    const entry = {startTime: startTime, endTime: endTime};
+    const entry = { startTime: startTime, endTime: endTime };
     appChanges++;
     console.log(appInfo);
+    console.log(entry);
 
     // key exists, then append it
     if (allStore.appHistory.hasOwnProperty(appPath)) {
@@ -147,6 +148,7 @@ app.post("/new/appchange/", (req, res) => {
 
     // check if should write to file (tab changed num limit reached)
     if (appChanges >= APP_CHANGE_THRESHOLD) {
+        console.log("writing to app");
         // is still today
         if (storeIsToday(allStore)) {
             writeToFile(CURRENT_SCREENTIME_DATA_FILE_NAME, JSON.stringify(allStore));
@@ -157,7 +159,7 @@ app.post("/new/appchange/", (req, res) => {
             allStore = { day: today.getDate(), month: today.getMonth() + 1, year: today.getFullYear(), tabHistory: {}, appHistory: {}, tabPairs: {}, appPairs: {} }
         }
     }
-    res.send("");
+    res.send("received");
 })
 
 findFreePorts(1).then(port => {
