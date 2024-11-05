@@ -29,7 +29,6 @@ namespace TrayApp
             new WinhookHandler();
             
         }
-
         void Exit(object? sender, EventArgs e)
         {
             trayIcon.Visible = false;

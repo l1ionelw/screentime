@@ -19,7 +19,7 @@ namespace TrayApp
             string logPrefix = "["+now.ToString("MM-dd-yyyy HH:mm:ss")+"] " + content;
             writeToFile(logPrefix);
         }
-        public void writeToFile(string content)
+        private void writeToFile(string content)
         {
             using (StreamWriter outputFile = new StreamWriter(loggerPath, true))
             {
