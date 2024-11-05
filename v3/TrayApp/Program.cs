@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -16,6 +17,7 @@ namespace TrayApp
         {
             Application.EnableVisualStyles();
             Console.WriteLine("Trayapp is starting");
+            Thread.Sleep(10000); // wait 10 sec
             Application.Run(new TrayApplicationContext());
         }
     }
