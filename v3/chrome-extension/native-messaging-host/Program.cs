@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Microsoft.Win32;
 using NativeMessaging;
 using NativeMessagingHost;
-using Newtonsoft.Json;
 
 namespace TrayApp
 {
+    public struct Port
+    {
+        public string port;
+    }
     class Program
     {
         static public string AssemblyLoadDirectory
@@ -39,7 +36,7 @@ namespace TrayApp
 
         static Host Host;
 
-        static string[] AllowedOrigins = new string[] { "chrome-extension://ccajjfgdplbgakojnhgodjpccjdnblpg/" };
+        static string[] AllowedOrigins = new string[] { "chrome-extension://knldjmfmopnpolahpmmgbagdohdnhkik/" };
         static string Description = "Description Goes Here";
 
         static void Main(string[] args)
@@ -55,5 +52,4 @@ namespace TrayApp
             }
         }
     }
-
 }

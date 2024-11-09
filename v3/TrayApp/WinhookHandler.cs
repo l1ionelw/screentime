@@ -13,6 +13,7 @@ using System.Net.Http;
 using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
 using System.Security.Policy;
+using System.Reflection;
 
 namespace TrayApp
 {
@@ -39,12 +40,24 @@ namespace TrayApp
         #endregion
 
         #region callback
-        string API_URL = "http://localhost:5057/new/appchange/";
+        string API_URL = getApiUrl();
         ApplicationInfo appinfo = WindowManager.getWindowTitle();
         long startTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         long endTime;
 
-
+        public static string getApiUrl ()
+        {
+            string PORT = "null";
+            string path = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            // get current exe dir
+            path = Path.GetFullPath(Path.Combine(path, @"..\..\..\"));
+            path = Path.GetFullPath(Path.Combine(path, @"express-webserver\port.txt"));
+            if (File.Exists(path)) {
+                Console.WriteLine("exists, reading from it!");
+                PORT = File.ReadAllText(path);
+            }
+            return $"http://localhost:{PORT}/new/appchange/";
+        }
         public async void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
             endTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
