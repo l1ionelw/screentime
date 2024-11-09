@@ -20,7 +20,7 @@ namespace TrayApp
     public class WinhookHandler
     {
         static FileLogger appLogger = new FileLogger("log.txt");
-        private static readonly HttpClient client = new HttpClient();
+        private static readonly HttpClient client = new HttpClient() { Timeout=TimeSpan.FromSeconds(5) };
 
         #region imports 
         WinEventDelegate dele = null;
@@ -40,23 +40,39 @@ namespace TrayApp
         #endregion
 
         #region callback
-        string API_URL = getApiUrl();
+        string API_URL = "";
         ApplicationInfo appinfo = WindowManager.getWindowTitle();
         long startTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         long endTime;
 
-        public static string getApiUrl ()
+        public async Task setApiUrl ()
         {
-            string PORT = "null";
-            string path = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            // get current exe dir
-            path = Path.GetFullPath(Path.Combine(path, @"..\..\..\"));
-            path = Path.GetFullPath(Path.Combine(path, @"express-webserver\port.txt"));
-            if (File.Exists(path)) {
-                Console.WriteLine("exists, reading from it!");
-                PORT = File.ReadAllText(path);
+            // 6125-6135 port ranges
+            int port = -1;
+            for (int i = 6125; i <= 6135; i++)
+            {
+                try
+                {
+                    // Send a GET request to the current port
+                    HttpResponseMessage response = await client.GetAsync($"http://localhost:{i}/");
+
+                    // Check if the response is successful
+                    if (response.IsSuccessStatusCode)
+                    {
+                        port = i;
+                        API_URL = $"http://localhost:{i}/new/appchange/";
+                        Console.WriteLine($"Found open port: {i}");
+                        break;  // Exit loop if a response is received
+                    }
+                }
+                catch (HttpRequestException)
+                {
+                    // Ignore if no response (port is closed or unavailable)
+                    Console.WriteLine("Port closed at " + i);
+                    continue;
+                }
+
             }
-            return $"http://localhost:{PORT}/new/appchange/";
         }
         public async void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
@@ -97,6 +113,7 @@ namespace TrayApp
         public WinhookHandler()
         {
             appLogger.log("Window hook initialized");
+            Task.Run(async () => await setApiUrl()).GetAwaiter().GetResult();
             appLogger.log(API_URL);
             dele = new WinEventDelegate(WinEventProc);
             IntPtr m_hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, dele, 0, 0, WINEVENT_OUTOFCONTEXT);

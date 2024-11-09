@@ -1,18 +1,41 @@
-console.log("extension started!");
-const NATIVE_APP_EXTENSION = "com.screentime.port";
 let API_PORT = null;
-port = chrome.runtime.connectNative(NATIVE_APP_EXTENSION);
+async function findOpenPort(startPort = 6125, endPort = 6135) {
+    let openPort = null;
+    // TODO: add a timeout on this
 
-function getPort() {
-    port.onMessage.addListener((msg) => {
-        console.log("Received from native app:", msg);
-        API_PORT = msg.port;
-    });
-    port.onDisconnect.addListener(function () {
-        console.log('Disconnected');
-      });      
+    for (let port = startPort; port <= endPort; port++) {
+        try {
+            // Attempt to fetch from each port
+            const response = await fetch(`http://localhost:${port}`);
+
+            // Check if the response is successful
+            if (response.ok) {
+                openPort = port;
+                console.log(`Open port found: ${openPort}`);
+                break;  // Exit the loop if an open port is found
+            }
+        } catch (error) {
+            // Ignore errors and continue to the next port
+            continue;
+        }
+    }
+
+    if (openPort === null) {
+        console.log("No open ports found in the specified range.");
+    }
+
+    return openPort;  // Return the open port or null if none were found
 }
-getPort();
+findOpenPort().then(openPort => {
+    if (openPort) {
+        console.log(`The first open port found is: ${openPort}`);
+        API_PORT = openPort;
+    } else {
+        console.log("No open ports were found.");
+    }
+});
+
+console.log("STARTING EXTENSION");
 
 let lastWindowState = 0
 let currentTab;

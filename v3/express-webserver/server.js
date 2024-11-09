@@ -1,5 +1,6 @@
 const express = require('express');
 const findFreePorts = require('find-free-ports');
+const isFreePort = require('find-free-ports');
 const { writeFileSync, appendFileSync, readFileSync } = require("node:fs");
 var cors = require('cors')
 const app = express();
@@ -10,6 +11,7 @@ const LOG_FILE_NAME = "log.txt";
 const CURRENT_SCREENTIME_DATA_FILE_NAME = "current.json";
 const TAB_CHANGE_THRESHOLD = 5;
 const APP_CHANGE_THRESHOLD = 10;
+
 
 function logMessage(message) {
     const now = new Date();
@@ -82,7 +84,7 @@ setInterval(() => {
 }, 300000) // 5 minutes
 
 app.get('/', (req, res) => {
-    res.send('Hello, World!');
+    res.send('Screentime server online!');
 });
 
 app.post("/new/tabchange/", (req, res) => {
@@ -162,7 +164,7 @@ app.post("/new/appchange/", (req, res) => {
     res.send("received");
 })
 
-findFreePorts(1).then(port => {
+findFreePorts(1, { startPort: 6125, endPort: 6135 }).then(port => {
     app.listen(port[0], () => {
         console.log(`Server running at http://localhost:${port}`);
         writeFileSync("port.txt", port[0].toString());
