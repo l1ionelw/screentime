@@ -55,14 +55,19 @@ namespace TrayApp
                 {
                     // Send a GET request to the current port
                     HttpResponseMessage response = await client.GetAsync($"http://localhost:{i}/");
-
+                    Console.WriteLine("testing port " + i);
                     // Check if the response is successful
                     if (response.IsSuccessStatusCode)
                     {
-                        port = i;
-                        API_URL = $"http://localhost:{i}/new/appchange/";
-                        Console.WriteLine($"Found open port: {i}");
-                        break;  // Exit loop if a response is received
+                        string text = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine(text);
+                        if (text == "Screentime server online!")
+                        {
+                            port = i;
+                            API_URL = $"http://localhost:{i}/new/appchange/";
+                            Console.WriteLine($"Found open port: {i}");
+                            break;  // Exit loop if a response is received
+                        }
                     }
                 }
                 catch (HttpRequestException)

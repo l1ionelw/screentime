@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TrayApp.Properties;
@@ -14,7 +15,7 @@ namespace TrayApp
         static FileLogger appLogger = new FileLogger("log.txt");
         private NotifyIcon trayIcon;
 
-        public TrayApplicationContext()
+        public TrayApplicationContext(string[] args)
         {
             trayIcon = new NotifyIcon()
             {
@@ -25,7 +26,19 @@ namespace TrayApp
                 },
                 Visible = true
             };
+
+            if (args.Length > 0)
+            {
+                if (args[0] == "--delayedStart")
+                {
+                    trayIcon.Text = "Screentime - Waiting for server";
+                    Console.WriteLine("delaying start");
+                    Thread.Sleep(10000); // wait 10 sec
+                }
+            }
+            trayIcon.Text = "Screentime";
             appLogger.log("Application init");
+            Console.WriteLine("Starting window event listener");
             new WinhookHandler();
             
         }

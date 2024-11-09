@@ -17,8 +17,8 @@ namespace TrayApp
         {
             Application.EnableVisualStyles();
             Console.WriteLine("Trayapp is starting");
-            // Thread.Sleep(10000); // wait 10 sec
-            Application.Run(new TrayApplicationContext());
+            Console.WriteLine("Running tray entrypoint");
+            Application.Run(new TrayApplicationContext(args));
         }
     }
 }

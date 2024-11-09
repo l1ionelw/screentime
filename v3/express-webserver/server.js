@@ -171,3 +171,8 @@ findFreePorts(1, { startPort: 6125, endPort: 6135 }).then(port => {
         console.log("Written port to file!");
     })
 });
+// app.listen(6135, () => {
+//     console.log(`Server running at http://localhost:6135`);
+//     writeFileSync("port.txt", "6135".toString());
+//     console.log("Written port to file!");
+// });
