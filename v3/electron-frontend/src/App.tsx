@@ -1,19 +1,26 @@
 import './App.css'
-import {useMemo, useState} from "react";
+import {useEffect, useState} from "react";
 import {DateTime} from "luxon";
 
 function App() {
     const [currentDay, setCurrentDay] = useState(DateTime.now().startOf("day"));
     const [data, setData] = useState(getData(currentDay));
-    useMemo(() => {
+    useEffect(() => {
         setData(getData(currentDay));
     }, [currentDay]);
+    // useMemo(() => {
+    //     setData(getData(currentDay));
+    // }, [currentDay]);
 
     function getData(date: DateTime) {
         console.log("getting data!");
         // is today, fetch from server
         if (date.equals(DateTime.now().startOf("day"))) {
-            return "isToday"
+            fetch("http://localhost:6125/store/").then(async (response) => {
+                const json = await response.json();
+                console.log(json);
+            })
+            return "isToday";
         }
         // is not today, read from file
         return "isNotToday";

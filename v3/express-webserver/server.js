@@ -162,6 +162,10 @@ app.post("/new/appchange/", (req, res) => {
         }
     }
     res.send("received");
+});
+app.get("/store/", (req, res)=> {
+    console.log("getting all store");
+    res.json(allStore);
 })
 
 findFreePorts(1, { startPort: 6125, endPort: 6135 }).then(port => {
