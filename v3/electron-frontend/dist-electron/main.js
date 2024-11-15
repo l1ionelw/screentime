@@ -1,6 +1,7 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import * as fs from "node:fs/promises";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 process.env.APP_ROOT = path.join(__dirname, "..");
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
@@ -34,6 +35,10 @@ app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
+});
+ipcMain.handle("readFile", async (_event, args) => {
+  console.log(args);
+  return fs.readFile(path.join("C:\\Users\\yiche\\screentime\\v3\\express-webserver\\", args), "utf8");
 });
 app.whenReady().then(createWindow);
 export {

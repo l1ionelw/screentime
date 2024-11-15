@@ -3,27 +3,35 @@ import {useEffect, useState} from "react";
 import {DateTime} from "luxon";
 
 function App() {
+    const [errorMessage, setErrorMessage] = useState("");
     const [currentDay, setCurrentDay] = useState(DateTime.now().startOf("day"));
-    const [data, setData] = useState(getData(currentDay));
+    const [screenTime, setScreenTime] = useState({});
     useEffect(() => {
-        setData(getData(currentDay));
+        getData(currentDay);
     }, [currentDay]);
-    // useMemo(() => {
-    //     setData(getData(currentDay));
-    // }, [currentDay]);
 
     function getData(date: DateTime) {
-        console.log("getting data!");
+        setErrorMessage("");
+        setScreenTime("");
         // is today, fetch from server
         if (date.equals(DateTime.now().startOf("day"))) {
-            fetch("http://localhost:6125/store/").then(async (response) => {
+            fetch("http://localhost:6126/store/").then(async (response) => {
                 const json = await response.json();
-                console.log(json);
+                setScreenTime(json);
             })
-            return "isToday";
+            return;
         }
         // is not today, read from file
-        return "isNotToday";
+        window.api.readFile(generateFilename(date)).then((data: string) => {
+            setScreenTime(JSON.parse(data));
+        }).catch((err: Error) => {
+            console.error(err);
+            setErrorMessage(err.message);
+        })
+    }
+
+    function generateFilename(date: DateTime) {
+        return `${date.month}-${date.day}-${date.year}.json`;
     }
 
     return (
@@ -34,7 +42,12 @@ function App() {
             </div>
 
             <h1>{currentDay.toString()}</h1>
-            <h1>{data.toString()}</h1>
+            <p>{screenTime !== "" ? JSON.stringify(screenTime) : "No data"}</p>
+            {errorMessage && <>
+                <h1>Error</h1>
+                <p>{errorMessage}</p>
+            </>
+            }
         </>
     )
 }

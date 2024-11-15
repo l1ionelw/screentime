@@ -20,3 +20,7 @@ electron.contextBridge.exposeInMainWorld("ipcRenderer", {
   // You can expose other APTs you need here.
   // ...
 });
+const WINDOW_API = {
+  readFile: (filename) => electron.ipcRenderer.invoke("readFile", filename)
+};
+electron.contextBridge.exposeInMainWorld("api", WINDOW_API);
