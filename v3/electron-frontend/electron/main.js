@@ -26,7 +26,7 @@ export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
 
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST
 
-let win: BrowserWindow | null
+let win= BrowserWindow ?? null
 
 function createWindow() {
     win = new BrowserWindow({
@@ -69,6 +69,7 @@ app.on('activate', () => {
 
 ipcMain.handle("readFile", async (_event, args) => {
     console.log(args);
+    const exeFolder = path.resolve('.');
     return fs.readFile(path.join("C:\\Users\\yiche\\screentime\\v3\\express-webserver\\", args), "utf8");
 })
 

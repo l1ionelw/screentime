@@ -8,7 +8,7 @@ const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
 const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
 const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
-let win;
+let win = BrowserWindow ?? null;
 function createWindow() {
   win = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
@@ -38,6 +38,9 @@ app.on("activate", () => {
 });
 ipcMain.handle("readFile", async (_event, args) => {
   console.log(args);
+  const myAppPath = path.resolve(".");
+  console.log(myAppPath);
+  await fs.writeFile("log.txt", myAppPath.toString());
   return fs.readFile(path.join("C:\\Users\\yiche\\screentime\\v3\\express-webserver\\", args), "utf8");
 });
 app.whenReady().then(createWindow);

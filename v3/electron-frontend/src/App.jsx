@@ -10,7 +10,7 @@ function App() {
         getData(currentDay);
     }, [currentDay]);
 
-    function getData(date: DateTime) {
+    function getData(date) {
         setErrorMessage("");
         setScreenTime("");
         // is today, fetch from server
@@ -22,15 +22,15 @@ function App() {
             return;
         }
         // is not today, read from file
-        window.api.readFile(generateFilename(date)).then((data: string) => {
+        window.api.readFile(generateFilename(date)).then((data) => {
             setScreenTime(JSON.parse(data));
-        }).catch((err: Error) => {
+        }).catch((err) => {
             console.error(err);
             setErrorMessage(err.message);
         })
     }
 
-    function generateFilename(date: DateTime) {
+    function generateFilename(date) {
         return `${date.month}-${date.day}-${date.year}.json`;
     }
 
