@@ -38,9 +38,7 @@ app.on("activate", () => {
 });
 ipcMain.handle("readFile", async (_event, args) => {
   console.log(args);
-  const myAppPath = path.resolve(".");
-  console.log(myAppPath);
-  await fs.writeFile("log.txt", myAppPath.toString());
+  path.resolve(".");
   return fs.readFile(path.join("C:\\Users\\yiche\\screentime\\v3\\express-webserver\\", args), "utf8");
 });
 app.whenReady().then(createWindow);
