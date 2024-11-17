@@ -163,7 +163,7 @@ app.post("/new/appchange/", (req, res) => {
     }
     res.send("received");
 });
-app.get("/store/", (req, res)=> {
+app.get("/store/", (req, res) => {
     console.log("getting all store");
     res.json(allStore);
 })
