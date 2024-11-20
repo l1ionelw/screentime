@@ -6,12 +6,12 @@ async function findOpenPort(startPort = 6125, endPort = 6135) {
     for (let port = startPort; port <= endPort; port++) {
         try {
             // Attempt to fetch from each port
-            const response = await fetch(`http://localhost:${port}`);
+            const response = await fetch(`http://localhost:${port}`).catch(e => console.log(e.message));
             console.log("checking port " + port);
             // Check if the response is successful
             if (response.ok) {
                 const text = await response.text();
-                if (text === "Screentime server online!") {
+                if (text === "Screentime API!") {
                     openPort = port;
                     console.log(`Open port found: ${openPort}`);
                     break;  // Exit the loop if an open port is found

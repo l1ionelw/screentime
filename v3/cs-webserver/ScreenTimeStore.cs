@@ -2,21 +2,21 @@
 {
     public class ScreenTimeStore
     {
-        public List<KeyValuePair<string, List<KeyValuePair<long, long>>>> appHistory { get; set; }
-        public List<KeyValuePair<string, List<KeyValuePair<long, long>>>> tabHistory { get; set; }
-        public List<KeyValuePair<string, AppInfo>> appPairs { get; set; }
-        public List<KeyValuePair<string, TabInfo>> tabPairs { get; set; }
+        public Dictionary<string, List<string>> appHistory { get; set; }
+        public Dictionary<string, List<string>> tabHistory { get; set; }
+        public Dictionary<string, AppInfo> appPairs { get; set; }
+        public Dictionary<string, TabInfo> tabPairs { get; set; }
 
     }
     public class AppInfo
     {
-        string path { get; set; }
-        string fileDescription { get; set; }
-        string productName { get; set; }
+        public string path { get; set; }
+        public string fileDescription { get; set; }
+        public string productName { get; set; }
     }
     public class TabInfo
     {
-        string path { get; set; }
-        string title { get; set; }
+        public string path { get; set; }
+        public string title { get; set; }
     }
 }

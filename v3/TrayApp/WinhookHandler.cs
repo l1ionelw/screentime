@@ -61,7 +61,7 @@ namespace TrayApp
                     {
                         string text = await response.Content.ReadAsStringAsync();
                         Console.WriteLine(text);
-                        if (text == "Screentime server online!")
+                        if (text == "Screentime API!")
                         {
                             port = i;
                             API_URL = $"http://localhost:{i}/new/appchange/";
@@ -88,8 +88,9 @@ namespace TrayApp
             JsonPostData postData = new JsonPostData() { appInfo=applicationInfo, appPath=appinfo.path, endTime=endTime, startTime=startTime };
             // new app and tab times
             string output = JsonConvert.SerializeObject(postData);
-            // if less than 3 then skip 
-            if (endTime - startTime > 3)
+            Console.WriteLine(applicationInfo.path);
+            // if less than 1 second then skip (alt tab or shell host dialog) 
+            if (endTime - startTime > 1)
             {
                 using (HttpClient client = new HttpClient())
                 {
