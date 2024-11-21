@@ -1,0 +1,22 @@
+webserver 
+1. compile with "dotnet publish -r win-x64 -p:PublishSingleFile=true --self-contained true"
+2. PowerShell script: "start cs-webserver.exe -WindowStyle Hidden"
+3. move exe to build/webserver (only exe)
+
+TrayApp 
+1. run release
+2. move exe to build/trayapp
+
+Electron UI
+1. run npm run build
+2. move exe FOLDER to build/electron
+
+INNO SETUP
+task scheduler - 
+trayapp - highest priviledges, at login
+SCHTASKS /Create /RU SYSTEM /TN "Screentime Tray Application" /RL HIGHEST /TR "C:\Users\yiche\screentime\v3\build\trayapp\TrayApp.exe --delayedStart" /SC ONLOGON
+
+webserver - highest priviledges, at login 
+SCHTASKS /Create /RU SYSTEM /TN "Screentime File Writer Webserver" /RL HIGHEST /TR "C:\Users\yiche\screentime\v3\build\webserver\cs-webserver.exe" /SC ONLOGON
+
+REGISTRY
