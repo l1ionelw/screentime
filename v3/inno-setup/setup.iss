@@ -29,6 +29,20 @@ WizardStyle=modern
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "C:\Users\yiche\screentime\v3\build\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\yiche\screentime\v3\build\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs;
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
+
+[UninstallRun]
+Filename: "taskkill"; Parameters: "/im ""cs-webserver.exe"" /f"; Flags: runhidden
+Filename: "schtasks"; Parameters: "/Delete /TN ""Screentime Webserver"" /F"; Flags: runhidden
+
+
+[Run]
+Filename: "schtasks"; \
+    Parameters: "/Create /F /SC ONLOGON /RL HIGHEST /ru SYSTEM /TN ""Screentime Webserver"" /TR ""'{app}\webserver\start.bat'"""; \
+    Flags: runhidden
+Filename: "schtasks"; \
+    Parameters: "/run /tn ""Screentime Webserver"""; \
+    Flags: runhidden
+    
