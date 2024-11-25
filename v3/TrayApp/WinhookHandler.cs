@@ -55,17 +55,17 @@ namespace TrayApp
                 {
                     // Send a GET request to the current port
                     HttpResponseMessage response = await client.GetAsync($"http://localhost:{i}/");
-                    Console.WriteLine("testing port " + i);
+                    appLogger.log("testing port " + i);
                     // Check if the response is successful
                     if (response.IsSuccessStatusCode)
                     {
                         string text = await response.Content.ReadAsStringAsync();
-                        Console.WriteLine(text);
+                        appLogger.log(text);
                         if (text == "Screentime API!")
                         {
                             port = i;
                             API_URL = $"http://localhost:{i}/new/appchange/";
-                            Console.WriteLine($"Found open port: {i}");
+                            appLogger.log($"Found open port: {i}");
                             break;  // Exit loop if a response is received
                         }
                     }
@@ -73,22 +73,23 @@ namespace TrayApp
                 catch (HttpRequestException)
                 {
                     // Ignore if no response (port is closed or unavailable)
-                    Console.WriteLine("Port closed at " + i);
+                    appLogger.log("Port closed at " + i);
                     continue;
                 }
 
             }
         }
+            
         public async void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
             endTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            Console.WriteLine("Window title changed");
+            appLogger.log("Window title changed");
             // generate data for previous app
             ApplicationInfo applicationInfo = new ApplicationInfo() { fileDescription=appinfo.fileDescription, path=appinfo.path,  productName=appinfo.productName};
             JsonPostData postData = new JsonPostData() { appInfo=applicationInfo, appPath=appinfo.path, endTime=endTime, startTime=startTime };
             // new app and tab times
             string output = JsonConvert.SerializeObject(postData);
-            Console.WriteLine(applicationInfo.path);
+            appLogger.log(applicationInfo.path);
             // if less than 1 second then skip (alt tab or shell host dialog) 
             if (endTime - startTime > 1)
             {
@@ -104,11 +105,11 @@ namespace TrayApp
 
                         // Read and print the response content
                         string responseContent = await response.Content.ReadAsStringAsync();
-                        Console.WriteLine($"Response: {responseContent}");
+                        appLogger.log($"Response: {responseContent}");
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Error: {ex.Message}");
+                        appLogger.log($"Error: {ex.Message}");
                     }
                 }
             }

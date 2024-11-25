@@ -29,10 +29,10 @@ namespace TrayApp
 
             if (args.Length > 0)
             {
-                if (args[0] == "--delayedStart")
+                if (args[0] == "--delayedStart" || args[0] == "--delayStart" || args[0] == "delayedStart" || args[0] == "delayStart")
                 {
                     trayIcon.Text = "Screentime - Waiting for server";
-                    Console.WriteLine("delaying start");
+                    appLogger.log("delaying start");
                     Thread.Sleep(10000); // wait 10 sec
                 }
             }

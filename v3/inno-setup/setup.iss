@@ -27,6 +27,8 @@ SolidCompression=yes
 WizardStyle=modern
 LZMAUseSeparateProcess=yes
 LZMANumBlockThreads=6
+ArchitecturesAllowed=x64compatible
+ArchitecturesInstallIn64BitMode=x64compatible
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -40,13 +42,20 @@ Source: "C:\Users\yiche\screentime\v3\build\*"; DestDir: "{app}"; Flags: ignorev
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\electron\screentime-development.exe"
+Name: "{commonstartup}\TrayAppStandard.exe"; Filename: "{app}\trayapp\TrayAppStandard.exe";
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\electron\screentime-development.exe"; Tasks: desktopicon
+
+[Registry]
+; Add the application to the autorun registry
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Screentime Standard Tray App"; ValueData: """{app}\trayapp\TrayAppStandard.exe"""; Flags: uninsdeletevalue
 
 [UninstallRun]
 Filename: "taskkill"; Parameters: "/im ""cs-webserver.exe"" /f"; Flags: runhidden
 Filename: "taskkill"; Parameters: "/im ""TrayApp.exe"" /f"; Flags: runhidden
+Filename: "taskkill"; Parameters: "/im ""TrayAppStandard.exe"" /f"; Flags: runhidden
 Filename: "schtasks"; Parameters: "/Delete /TN ""Screentime Webserver"" /F"; Flags: runhidden
 Filename: "schtasks"; Parameters: "/Delete /TN ""Screentime Window Change Manager"" /F"; Flags: runhidden
+Filename: "schtasks"; Parameters: "/Delete /TN ""Screentime Window Change Manager Standard"" /F"; Flags: runhidden
 
 [Run]
 Filename: "schtasks"; \
@@ -64,3 +73,9 @@ Filename: "schtasks"; \
 Filename: "schtasks"; \
     Parameters: "/run /tn ""Screentime Window Change Manager"""; \
     Flags: runhidden
+    
+Filename: "schtasks"; \
+    Parameters: "/run /tn ""Screentime Window Change Manager Standard"""; \
+    Flags: runhidden
+
+Filename: "{app}\trayapp\TrayAppStandard.exe"; Flags: nowait
