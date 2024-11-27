@@ -26,3 +26,25 @@
 [11/19/2024 20:34] This port is open: 6125
 [11/19/2024 20:34] App started on port: 6125
 [11/19/2024 20:34] Initializing file timer
+[11/26/2024 20:07] APPLICATION INIT
+[11/26/2024 20:07] Checking for another entry from today
+[11/26/2024 20:07] -------
+[11/26/2024 20:07] -------
+[11/26/2024 20:07] Store initialization finished!
+[11/26/2024 20:07] Webserver: Finding free port
+[11/26/2024 20:07] Checking for open port in range 6125 - 6135 (hardcoded)
+[11/26/2024 20:07] This port is not open: 6125
+[11/26/2024 20:07] This port is open: 6126
+[11/26/2024 20:07] App started on port: 6126
+[11/26/2024 20:07] Initializing file timer
+[11/26/2024 20:08] APPLICATION INIT
+[11/26/2024 20:08] Checking for another entry from today
+[11/26/2024 20:08] -------
+[11/26/2024 20:08] -------
+[11/26/2024 20:08] Store initialization finished!
+[11/26/2024 20:08] Webserver: Finding free port
+[11/26/2024 20:08] Checking for open port in range 6125 - 6135 (hardcoded)
+[11/26/2024 20:08] This port is not open: 6125
+[11/26/2024 20:08] This port is open: 6126
+[11/26/2024 20:08] App started on port: 6126
+[11/26/2024 20:08] Initializing file timer

@@ -44,16 +44,5 @@ Source: "C:\Users\yiche\screentime\v3\build\*"; DestDir: "{app}"; Flags: ignorev
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\electron\screentime-development.exe"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\electron\screentime-development.exe"; Tasks: desktopicon
 
-[Registry]
-Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Screentime Webserver"; ValueData: """{app}\webserver\cs-webserver.exe"""; Flags: uninsdeletevalue
-Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Screentime Tray App"; ValueData: """{app}\trayapp\TrayApp.exe"" delayedStart"; Flags: uninsdeletevalue
-
-[UninstallRun]
-Filename: "taskkill"; Parameters: "/im ""cs-webserver.exe"" /f"; Flags: runhidden
-Filename: "taskkill"; Parameters: "/im ""TrayApp.exe"" /f"; Flags: runhidden
-Filename: "schtasks"; Parameters: "/Delete /TN ""Screentime Webserver"" /F"; Flags: runhidden
-Filename: "schtasks"; Parameters: "/Delete /TN ""Screentime Window Change Manager"" /F"; Flags: runhidden
-
 [Run]
-Filename: "{app}\webserver\cs-webserver.exe"; Flags: nowait
-Filename: "{app}\trayapp\TrayApp.exe"; Flags: nowait
+Filename: "{app}\trayapp\TrayAppStandard.exe"; Flags: nowait

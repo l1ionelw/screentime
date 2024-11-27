@@ -1,0 +1,4 @@
+run admin installer
+install to program files, apps write to appdata
+put shortcuts for tray and server in commonstartup
+in electron, settings menu allow turning on of admin trayapp (installs task scheduler to run full perms on current USER account)

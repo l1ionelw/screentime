@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>cs_webserver</RootNamespace>
     <Platforms>AnyCPU;x64</Platforms>
+	<OutputType>WinExe</OutputType>
   </PropertyGroup>
 
 </Project>

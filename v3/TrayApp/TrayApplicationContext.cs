@@ -12,7 +12,7 @@ namespace TrayApp
 {
     public class TrayApplicationContext : ApplicationContext
     {
-        static FileLogger appLogger = new FileLogger("log.txt");
+        static FileLogger appLogger = new FileLogger("trayapplog.txt", "ScreenTime");
         private NotifyIcon trayIcon;
 
         public TrayApplicationContext(string[] args)

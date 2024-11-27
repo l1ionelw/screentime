@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TrayApp
 {
     internal class FileLogger
     {
-        string loggerPath;
-        public FileLogger(string path) {
-            loggerPath = path;
+        string _realFilePath;
+        public FileLogger(string path, string APPDATA_FOLDER_NAME) {
+            _realFilePath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), APPDATA_FOLDER_NAME), path);
         }
         public void log(string content)
         {
@@ -22,7 +18,7 @@ namespace TrayApp
         }
         private void writeToFile(string content)
         {
-            using (StreamWriter outputFile = new StreamWriter(loggerPath, true))
+            using (StreamWriter outputFile = new StreamWriter(_realFilePath, true))
             {
                 outputFile.WriteLine(content);
             }

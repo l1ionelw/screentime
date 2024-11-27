@@ -6,17 +6,21 @@ using cs_webserver;
 
 class Program
 {
-    static AppLogger logger = new AppLogger("log.txt");
+    public static string APPDATA_DIR_NAME = "ScreenTime";
+    static AppLogger logger = new AppLogger("serverlog.txt", APPDATA_DIR_NAME);
     static ScreenTimeStore allStore = new ScreenTimeStore();
     static DateTime CURRENT_DAY = DateTime.Now;
     static int FILESAVE_TIMER_SECONDS = 300;
-    static int APP_CHANGE_THRESHOLD = 3;
-    static int TAB_CHANGE_THRESHOLD = 3;
+    static int APP_CHANGE_THRESHOLD = 5;
+    static int TAB_CHANGE_THRESHOLD = 5;
     static int APP_CHANGES = 0;
     static int TAB_CHANGES = 0;
+    
 
     static void Main(string[] args)
     {
+        checkAppDataFolder();
+
         logger.Log("APPLICATION INIT");
         allStore = new ScreenTimeStore()
         {
@@ -28,7 +32,7 @@ class Program
         };
         DateTime today = DateTime.Now;
         logger.Log("Checking for another entry from today");
-        string currentFileName = generateFileNameFromDate(today);
+        string currentFileName = generateAppDataFilePath(generateFileNameFromDate(today));
         if (File.Exists(currentFileName))
         {
             logger.Log("entry exists, taking data from session");
@@ -132,15 +136,24 @@ class Program
     }
     #endregion
     #region utils
+    public static void checkAppDataFolder()
+    {
+        string targetDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), APPDATA_DIR_NAME);
+        if (!Directory.Exists(targetDirectory))
+        {
+            Directory.CreateDirectory(targetDirectory);
+        }
+    }
     public static async void initializeFileBackupTimer()
     {
         logger.Log("Initializing file timer");
+        string currentDayFile = generateAppDataFilePath(generateFileNameFromDate(CURRENT_DAY));
         var timer = new PeriodicTimer(TimeSpan.FromSeconds(FILESAVE_TIMER_SECONDS));
 
         while (await timer.WaitForNextTickAsync())
         {
-            logger.Log("Periodic timer save");
-
+            logger.Log("Periodic timer save: " + currentDayFile);
+            File.WriteAllText(currentDayFile, JsonSerializer.Serialize(allStore));
         }
     }
     public static void checkDay()
@@ -154,15 +167,16 @@ class Program
     }
     public static void backupData()
     {
-        logger.Log("Writing to file");
+        string currentDayFile = generateAppDataFilePath(generateFileNameFromDate(CURRENT_DAY));
+        logger.Log("Writing to file: " + currentDayFile);
         if (APP_CHANGES >= APP_CHANGE_THRESHOLD)
         {
-            File.WriteAllText(generateFileNameFromDate(CURRENT_DAY), JsonSerializer.Serialize(allStore));
+            File.WriteAllText(currentDayFile, JsonSerializer.Serialize(allStore));
             APP_CHANGES = 0;
         }
         if (TAB_CHANGES >= TAB_CHANGE_THRESHOLD)
         {
-            File.WriteAllText(generateFileNameFromDate(CURRENT_DAY), JsonSerializer.Serialize(allStore));
+            File.WriteAllText(currentDayFile, JsonSerializer.Serialize(allStore));
             TAB_CHANGES = 0;
         }
 
@@ -171,7 +185,7 @@ class Program
     {
         // sets allstore to file (usually todays date)
         // returns true on success and false on error
-        string fileContents = File.ReadAllText(filename);
+        string fileContents = File.ReadAllText(generateAppDataFilePath(filename));
         try
         {
             allStore = JsonSerializer.Deserialize<ScreenTimeStore>(fileContents);
@@ -187,6 +201,10 @@ class Program
     {
         return date.Year + "-" + date.Month + "-" + date.Day + ".json";
     } 
+    public static string generateAppDataFilePath(string filename)
+    {
+        return Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), APPDATA_DIR_NAME), filename);
+    }
     public static int getFreePort()
     {
         logger.Log("Checking for open port in range 6125 - 6135 (hardcoded)");

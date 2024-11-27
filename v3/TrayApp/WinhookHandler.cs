@@ -1,25 +1,16 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using RestWrapper;
-using System.IO;
 using System.Net.Http;
-using Microsoft.Win32;
-using Newtonsoft.Json.Linq;
-using System.Security.Policy;
-using System.Reflection;
+
 
 namespace TrayApp
 {
     public class WinhookHandler
     {
-        static FileLogger appLogger = new FileLogger("log.txt");
+        static FileLogger appLogger = new FileLogger("trayapplog.txt", "ScreenTime");
         private static readonly HttpClient client = new HttpClient() { Timeout=TimeSpan.FromSeconds(5) };
 
         #region imports 
