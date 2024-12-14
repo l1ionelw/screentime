@@ -22,7 +22,8 @@ class Program
     static void Main(string[] args)
     {
         bool createdNew;
-        Mutex m = new Mutex(true, "Global'\'" + "ScreenTime", out createdNew);
+        string mutexString = "Global\\ScreenTimeServer";
+        Mutex m = new Mutex(true, mutexString, out createdNew);
 
         if (!createdNew)
         {

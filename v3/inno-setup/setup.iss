@@ -45,7 +45,7 @@ Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\electron\screentime-develo
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\electron\screentime-development.exe"; Tasks: desktopicon
 
 [Registry]
-Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Screentime Webserver"; ValueData: """{app}\webserver\cs-webserver.exe"""; Flags: uninsdeletevalue
+; Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Screentime Webserver"; ValueData: """{app}\webserver\cs-webserver.exe"""; Flags: uninsdeletevalue
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Screentime Tray App"; ValueData: """{app}\trayapp\TrayApp.exe"" delayedStart"; Flags: uninsdeletevalue
 
 [UninstallRun]
@@ -55,5 +55,12 @@ Filename: "schtasks"; Parameters: "/Delete /TN ""Screentime Webserver"" /F"; Fla
 Filename: "schtasks"; Parameters: "/Delete /TN ""Screentime Window Change Manager"" /F"; Flags: runhidden
 
 [Run]
-Filename: "{app}\webserver\cs-webserver.exe"; Flags: nowait
+Filename: "schtasks"; \
+    Parameters: "/Create /F /SC ONLOGON /RL HIGHEST /RU SYSTEM /TN ""Screentime Webserver"" /TR ""'{app}\webserver\cs-webserver.exe'"""; \
+    Flags: runhidden
+
+Filename: "schtasks"; \
+    Parameters: "/run /tn ""Screentime Webserver"""; \
+    Flags: runhidden
+    
 Filename: "{app}\trayapp\TrayApp.exe"; Flags: nowait

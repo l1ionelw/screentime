@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -17,14 +18,16 @@ namespace TrayApp
         [STAThread]
         static void Main(string[] args)
         {
+            string userSid = WindowsIdentity.GetCurrent().User?.Value;
+            string mutexName = $"Global\\ScreenTimeTrayApp_{userSid}";
             bool createdNew;
-            Mutex m = new Mutex(true, APPDATA_DIR_NAME, out createdNew);
-
+            Mutex m = new Mutex(true, mutexName, out createdNew);
             if (!createdNew)
             {
                 MessageBox.Show(APPDATA_DIR_NAME + " is already running!", "Multiple Instances");
                 return;
             }
+            MessageBox.Show(APPDATA_DIR_NAME + " is NOT running, starting new instance!", "Multiple Instances");
             checkAppDataFolder();
             Application.EnableVisualStyles();
             Console.WriteLine("Trayapp is starting");
