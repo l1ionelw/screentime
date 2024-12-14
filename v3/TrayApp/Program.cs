@@ -17,8 +17,12 @@ namespace TrayApp
         [STAThread]
         static void Main(string[] args)
         {
-            if (System.Diagnostics.Process.GetProcessesByName(System.IO.Path.GetFileNameWithoutExtension(System.Reflection.Assembly.GetEntryAssembly().Location)).Count() > 1) {
-                Console.WriteLine("Another instance already running, quitting");
+            bool createdNew;
+            Mutex m = new Mutex(true, APPDATA_DIR_NAME, out createdNew);
+
+            if (!createdNew)
+            {
+                MessageBox.Show(APPDATA_DIR_NAME + " is already running!", "Multiple Instances");
                 return;
             }
             checkAppDataFolder();

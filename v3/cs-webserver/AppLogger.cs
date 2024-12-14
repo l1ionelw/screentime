@@ -4,9 +4,9 @@
     {
         private readonly string _realFilePath;
 
-        public AppLogger(string filename, string APPDATA_NAME)
+        public AppLogger(string filename, string APPDATA_PATH)
         {
-            _realFilePath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), APPDATA_NAME), filename);
+            _realFilePath = Path.Combine(APPDATA_PATH, "serverlog.txt");
         }
 
         public void Log(string message)

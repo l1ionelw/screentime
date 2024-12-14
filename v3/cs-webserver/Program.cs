@@ -6,8 +6,10 @@ using cs_webserver;
 
 class Program
 {
-    public static string APPDATA_DIR_NAME = "ScreenTime";
-    static AppLogger logger = new AppLogger("serverlog.txt", APPDATA_DIR_NAME);
+    public static string commonPath = Path.GetFullPath(Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), @"..\"));
+
+    public static string APPDATA_DIR_PATH = Path.Combine(commonPath, "ScreenTime");
+    static AppLogger logger = new AppLogger("serverlog.txt", APPDATA_DIR_PATH);
     static ScreenTimeStore allStore = new ScreenTimeStore();
     static DateTime CURRENT_DAY = DateTime.Now;
     static int FILESAVE_TIMER_SECONDS = 300;
@@ -19,8 +21,15 @@ class Program
 
     static void Main(string[] args)
     {
-        checkAppDataFolder();
+        bool createdNew;
+        Mutex m = new Mutex(true, "Global'\'" + "ScreenTime", out createdNew);
 
+        if (!createdNew)
+        {
+            logger.Log("A GLOBAL INSTANCE IS ALREADY RUNNING! TERMINATING!");
+            return;
+        }
+        checkAppDataFolder(APPDATA_DIR_PATH);
         logger.Log("APPLICATION INIT");
         allStore = new ScreenTimeStore()
         {
@@ -85,7 +94,9 @@ class Program
                 allStore.appHistory.Add(data.appPath, initialList);
                 allStore.appPairs.Add(data.appPath, data.appInfo);
             }
+            Debug.WriteLine("checkday");
             checkDay();
+            Debug.WriteLine("backupdata");
             backupData();
             return "Response received";
         });
@@ -136,9 +147,8 @@ class Program
     }
     #endregion
     #region utils
-    public static void checkAppDataFolder()
+    public static void checkAppDataFolder(string targetDirectory)
     {
-        string targetDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), APPDATA_DIR_NAME);
         if (!Directory.Exists(targetDirectory))
         {
             Directory.CreateDirectory(targetDirectory);
@@ -167,6 +177,7 @@ class Program
     }
     public static void backupData()
     {
+        Debug.WriteLine("Backup data called");
         string currentDayFile = generateAppDataFilePath(generateFileNameFromDate(CURRENT_DAY));
         logger.Log("Writing to file: " + currentDayFile);
         if (APP_CHANGES >= APP_CHANGE_THRESHOLD)
@@ -203,7 +214,7 @@ class Program
     } 
     public static string generateAppDataFilePath(string filename)
     {
-        return Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), APPDATA_DIR_NAME), filename);
+        return Path.Combine(APPDATA_DIR_PATH, filename);
     }
     public static int getFreePort()
     {
