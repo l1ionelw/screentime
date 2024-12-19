@@ -1,32 +1,49 @@
-import { app as n, BrowserWindow as i, ipcMain as a } from "electron";
-import { fileURLToPath as p } from "node:url";
-import e from "node:path";
-import * as d from "node:fs/promises";
-const t = e.dirname(p(import.meta.url));
-process.env.APP_ROOT = e.join(t, "..");
-const s = process.env.VITE_DEV_SERVER_URL, v = e.join(process.env.APP_ROOT, "dist-electron"), l = e.join(process.env.APP_ROOT, "dist");
-process.env.VITE_PUBLIC = s ? e.join(process.env.APP_ROOT, "public") : l;
-let o = i ?? null;
-function c() {
-  o = new i({
-    icon: e.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
+import { app, BrowserWindow, ipcMain } from "electron";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+import * as fs from "node:fs/promises";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+process.env.APP_ROOT = path.join(__dirname, "..");
+const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
+const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
+const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
+process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
+let win = BrowserWindow ?? null;
+function createWindow() {
+  win = new BrowserWindow({
+    icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     webPreferences: {
-      preload: e.join(t, "preload.mjs")
+      preload: path.join(__dirname, "preload.mjs")
     }
-  }), o.webContents.on("did-finish-load", () => {
-    o == null || o.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
-  }), s ? o.loadURL(s) : o.loadFile(e.join(l, "index.html"));
+  });
+  win.webContents.on("did-finish-load", () => {
+    win == null ? void 0 : win.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
+  });
+  if (VITE_DEV_SERVER_URL) {
+    win.loadURL(VITE_DEV_SERVER_URL);
+  } else {
+    win.loadFile(path.join(RENDERER_DIST, "index.html"));
+  }
 }
-n.on("window-all-closed", () => {
-  process.platform !== "darwin" && (n.quit(), o = null);
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
+    win = null;
+  }
 });
-n.on("activate", () => {
-  i.getAllWindows().length === 0 && c();
+app.on("activate", () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
 });
-a.handle("readFile", async (m, r) => (console.log(r), e.resolve("."), d.readFile(e.join("C:\\Users\\yiche\\screentime\\v3\\express-webserver\\", r), "utf8")));
-n.whenReady().then(c);
+ipcMain.handle("readFile", async (_event, args) => {
+  console.log(args);
+  path.resolve(".");
+  return fs.readFile(path.join("C:\\Users\\yiche\\screentime\\v3\\express-webserver\\", args), "utf8");
+});
+app.whenReady().then(createWindow);
 export {
-  v as MAIN_DIST,
-  l as RENDERER_DIST,
-  s as VITE_DEV_SERVER_URL
+  MAIN_DIST,
+  RENDERER_DIST,
+  VITE_DEV_SERVER_URL
 };

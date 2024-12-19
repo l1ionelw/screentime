@@ -1,1 +1,26 @@
-"use strict";const o=require("electron");o.contextBridge.exposeInMainWorld("ipcRenderer",{on(...e){const[n,r]=e;return o.ipcRenderer.on(n,(i,...t)=>r(i,...t))},off(...e){const[n,...r]=e;return o.ipcRenderer.off(n,...r)},send(...e){const[n,...r]=e;return o.ipcRenderer.send(n,...r)},invoke(...e){const[n,...r]=e;return o.ipcRenderer.invoke(n,...r)}});const c={readFile:e=>o.ipcRenderer.invoke("readFile",e)};o.contextBridge.exposeInMainWorld("api",c);
+"use strict";
+const electron = require("electron");
+electron.contextBridge.exposeInMainWorld("ipcRenderer", {
+  on(...args) {
+    const [channel, listener] = args;
+    return electron.ipcRenderer.on(channel, (event, ...args2) => listener(event, ...args2));
+  },
+  off(...args) {
+    const [channel, ...omit] = args;
+    return electron.ipcRenderer.off(channel, ...omit);
+  },
+  send(...args) {
+    const [channel, ...omit] = args;
+    return electron.ipcRenderer.send(channel, ...omit);
+  },
+  invoke(...args) {
+    const [channel, ...omit] = args;
+    return electron.ipcRenderer.invoke(channel, ...omit);
+  }
+  // You can expose other APTs you need here.
+  // ...
+});
+const WINDOW_API = {
+  readFile: (filename) => electron.ipcRenderer.invoke("readFile", filename)
+};
+electron.contextBridge.exposeInMainWorld("api", WINDOW_API);

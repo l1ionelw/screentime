@@ -24,10 +24,10 @@ namespace TrayApp
             Mutex m = new Mutex(true, mutexName, out createdNew);
             if (!createdNew)
             {
-                MessageBox.Show(APPDATA_DIR_NAME + " is already running!", "Multiple Instances");
+                // MessageBox.Show(APPDATA_DIR_NAME + " is already running!", "Multiple Instances");
                 return;
             }
-            MessageBox.Show(APPDATA_DIR_NAME + " is NOT running, starting new instance!", "Multiple Instances");
+            // MessageBox.Show(APPDATA_DIR_NAME + " is NOT running, starting new instance!", "Multiple Instances");
             checkAppDataFolder();
             Application.EnableVisualStyles();
             Console.WriteLine("Trayapp is starting");

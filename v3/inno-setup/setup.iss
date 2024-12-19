@@ -19,9 +19,9 @@ DefaultGroupName=ScreenTime
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputDir=C:\Users\yiche\screentime\v3\inno-setup\Output
+OutputDir=C:\Users\yiche\Documents\GitHub\screentime\v3\inno-setup\Output
 OutputBaseFilename=screentime-setup
-SetupIconFile=D:\PC-Files\Downloads\AppIcon.ico
+SetupIconFile=C:\Users\yiche\Documents\GitHub\screentime\v3\build\ScreenTime.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -37,7 +37,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\yiche\screentime\v3\build\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs;
+Source: "C:\Users\yiche\Documents\GitHub\screentime\v3\build\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs;
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
