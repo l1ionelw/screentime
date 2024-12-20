@@ -125,11 +125,31 @@ class Program
             return "Response received";
         });
 
+        app.MapGet("/filestore/{filename}.json", (string filename) =>
+        {
+            // Construct the file path using the filename
+            var filePath = Path.Combine(APPDATA_DIR_PATH, $"{filename}.json");
+
+            // Check if the file exists
+            if (File.Exists(filePath))
+            {
+                // Read the content of the file and return it as JSON
+                var content = File.ReadAllText(filePath);
+                return Results.Content(content, "application/json");
+            }
+            else
+            {
+                // Return a 404 if the file doesn't exist
+                return Results.NotFound();
+            }
+        });
+
         logger.Log("App started on port: " + APPLICATION_PORT);
 
         initializeFileBackupTimer();
         app.Run();
     }
+
 
     #region postRequestModels
     public class AppChangeData
