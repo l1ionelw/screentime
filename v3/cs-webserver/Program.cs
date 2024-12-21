@@ -193,6 +193,11 @@ class Program
         DateTime rightNow = DateTime.Now;
         if (CURRENT_DAY.Year != rightNow.Year || CURRENT_DAY.Month != rightNow.Month || CURRENT_DAY.Day != rightNow.Day)
         {
+            logger.Log("NOT SAME DAY");
+            logger.Log("Saving current store to json");
+            File.WriteAllText(generateAppDataFilePath(generateFileNameFromDate(CURRENT_DAY)), JsonSerializer.Serialize(allStore));
+            logger.Log("Erasing allstore and changing day");
+            allStore = new ScreenTimeStore();
             CURRENT_DAY = rightNow;
         }
     }

@@ -19,9 +19,9 @@ DefaultGroupName=ScreenTime
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputDir=C:\Users\yiche\Documents\Github\screentime\v3\inno-setup\Output
+OutputDir=C:\Users\yiche\screentime\v3\inno-setup\Output
 OutputBaseFilename=screentime-setup
-SetupIconFile=C:\Users\yiche\Documents\Github\screentime\v3\build\ScreenTime.ico
+SetupIconFile=C:\Users\yiche\screentime\v3\build\ScreenTime.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
