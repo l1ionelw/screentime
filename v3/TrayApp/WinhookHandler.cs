@@ -74,13 +74,12 @@ namespace TrayApp
         public async void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
             endTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            appLogger.log("Window title changed");
             // generate data for previous app
             ApplicationInfo applicationInfo = new ApplicationInfo() { fileDescription=appinfo.fileDescription, path=appinfo.path,  productName=appinfo.productName};
             JsonPostData postData = new JsonPostData() { appInfo=applicationInfo, appPath=appinfo.path, endTime=endTime, startTime=startTime };
             // new app and tab times
             string output = JsonConvert.SerializeObject(postData);
-            appLogger.log(applicationInfo.path);
+            
             // if less than 1 second then skip (alt tab or shell host dialog) 
             if (endTime - startTime > 1)
             {
@@ -93,6 +92,7 @@ namespace TrayApp
                     {
                         // Make the POST request asynchronously
                         HttpResponseMessage response = await client.PostAsync(API_URL, content);
+                        appLogger.log("Previous: " + applicationInfo.path);
 
                         // Read and print the response content
                         string responseContent = await response.Content.ReadAsStringAsync();
@@ -106,6 +106,7 @@ namespace TrayApp
             }
             startTime = endTime;
             appinfo = WindowManager.getWindowTitle();
+            appLogger.log("Current App: " + appinfo.path);
         }
         #endregion
         public WinhookHandler()

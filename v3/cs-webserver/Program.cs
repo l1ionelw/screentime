@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using cs_webserver;
 
 class Program
@@ -17,6 +19,7 @@ class Program
     static int TAB_CHANGE_THRESHOLD = 5;
     static int APP_CHANGES = 0;
     static int TAB_CHANGES = 0;
+    static JsonSerializerOptions serializerIgnoreNull = new JsonSerializerOptions() { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
     
 
     static void Main(string[] args)
@@ -40,9 +43,8 @@ class Program
             tabPairs = new Dictionary<string, TabInfo>(),
 
         };
-        DateTime today = DateTime.Now;
         logger.Log("Checking for another entry from today");
-        string currentFileName = generateAppDataFilePath(generateFileNameFromDate(today));
+        string currentFileName = generateAppDataFilePath(generateFileNameFromDate(CURRENT_DAY));
         if (File.Exists(currentFileName))
         {
             logger.Log("entry exists, taking data from session");
@@ -75,7 +77,7 @@ class Program
 
         app.MapGet("/", () => "Screentime API!");
 
-        app.MapGet("/store/", () => JsonSerializer.Serialize(allStore));
+        app.MapGet("/store/", () => JsonSerializer.Serialize(allStore,serializerIgnoreNull));
 
         app.MapPost("/new/appchange/", (AppChangeData data) =>
         {
@@ -104,7 +106,9 @@ class Program
 
         app.MapPost("/new/tabchange/", (TabChangeData data) =>
         {
+            
             Debug.WriteLine(data.tabUrl);
+            Debug.WriteLine(data.tabInfo);
             TAB_CHANGES++;
             string tabEntry = data.startTime + "|" + data.endTime;
             if (allStore.tabPairs.ContainsKey(data.tabUrl))
@@ -144,6 +148,52 @@ class Program
             }
         });
 
+        app.MapGet("/limits/", () =>
+        {
+            string timeLimitsFilePath = generateAppDataFilePath("limits.json");
+            if (File.Exists(timeLimitsFilePath))
+            {
+                var content = JsonSerializer.Serialize(File.ReadAllText(timeLimitsFilePath), serializerIgnoreNull);
+                return Results.Content(content, "application/json");
+            }
+            return Results.NotFound();
+        });
+
+        app.MapPost("/limits/add/", (LimitData data) =>
+        {
+            // validate hours and minutes are valid
+            if (data.allowHours < 0 || data.allowMinutes < 0 || data.allowHours >= 24 || data.allowMinutes > 60)
+            {
+                return Results.Problem("The time limit set is invalid");
+            }
+            // check and read json from limits.json
+            string timeLimitsFilePath = generateAppDataFilePath("limits.json");
+            LimitInfo limits = new LimitInfo()
+            {
+                appLimits = new Dictionary<string, string>(),
+                websiteLimits = new Dictionary<string, string>()
+            };
+            if (File.Exists(timeLimitsFilePath))
+            {
+                limits = JsonSerializer.Deserialize<LimitInfo>(File.ReadAllText(timeLimitsFilePath));
+            }
+            // if exists, change value, otherwise append new entry
+            string timeLimitString = data.allowHours.ToString() + "|" + data.allowMinutes.ToString();
+            if (data.type == "website")
+            {
+                if (limits.websiteLimits.ContainsKey(data.path)) limits.websiteLimits[data.path] = timeLimitString;
+                else limits.websiteLimits.Add(data.path, timeLimitString);
+            }
+            if (data.type == "app")
+            {
+                if (limits.appLimits.ContainsKey(data.path)) limits.websiteLimits[data.path] = timeLimitString;
+                else limits.appLimits.Add(data.path, timeLimitString);
+            }
+            // write back to json
+            File.WriteAllText(timeLimitsFilePath, JsonSerializer.Serialize(limits, serializerIgnoreNull));
+            return Results.Ok();
+        });
+
         logger.Log("App started on port: " + APPLICATION_PORT);
 
         initializeFileBackupTimer();
@@ -166,6 +216,13 @@ class Program
         public string tabUrl { get; set; }
         public TabInfo tabInfo { get; set; }
     }
+    public class LimitData
+    {
+        public string type { get; set; }
+        public string path { get; set; }
+        public int allowHours { get; set; }
+        public int allowMinutes { get; set; }
+    }
     #endregion
     #region utils
     public static void checkAppDataFolder(string targetDirectory)
@@ -184,7 +241,7 @@ class Program
         while (await timer.WaitForNextTickAsync())
         {
             logger.Log("Periodic timer save: " + currentDayFile);
-            File.WriteAllText(currentDayFile, JsonSerializer.Serialize(allStore));
+            File.WriteAllText(currentDayFile, JsonSerializer.Serialize(allStore, serializerIgnoreNull));
         }
     }
     public static void checkDay()
@@ -195,9 +252,16 @@ class Program
         {
             logger.Log("NOT SAME DAY");
             logger.Log("Saving current store to json");
-            File.WriteAllText(generateAppDataFilePath(generateFileNameFromDate(CURRENT_DAY)), JsonSerializer.Serialize(allStore));
+            File.WriteAllText(generateAppDataFilePath(generateFileNameFromDate(CURRENT_DAY)), JsonSerializer.Serialize(allStore, serializerIgnoreNull));
             logger.Log("Erasing allstore and changing day");
-            allStore = new ScreenTimeStore();
+            allStore = new ScreenTimeStore()
+            {
+                appHistory = new Dictionary<string, List<string>>(),
+                tabHistory = new Dictionary<string, List<string>>(),
+                appPairs = new Dictionary<string, AppInfo>(),
+                tabPairs = new Dictionary<string, TabInfo>(),
+
+            };
             CURRENT_DAY = rightNow;
         }
     }
@@ -208,12 +272,12 @@ class Program
         logger.Log("Writing to file: " + currentDayFile);
         if (APP_CHANGES >= APP_CHANGE_THRESHOLD)
         {
-            File.WriteAllText(currentDayFile, JsonSerializer.Serialize(allStore));
+            File.WriteAllText(currentDayFile, JsonSerializer.Serialize(allStore, serializerIgnoreNull));
             APP_CHANGES = 0;
         }
         if (TAB_CHANGES >= TAB_CHANGE_THRESHOLD)
         {
-            File.WriteAllText(currentDayFile, JsonSerializer.Serialize(allStore));
+            File.WriteAllText(currentDayFile, JsonSerializer.Serialize(allStore, serializerIgnoreNull));
             TAB_CHANGES = 0;
         }
 

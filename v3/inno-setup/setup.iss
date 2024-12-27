@@ -55,8 +55,13 @@ Filename: "schtasks"; Parameters: "/Delete /TN ""Screentime Webserver"" /F"; Fla
 Filename: "schtasks"; Parameters: "/Delete /TN ""Screentime Window Change Manager"" /F"; Flags: runhidden
 
 [Run]
-Filename: "schtasks"; \
+;Filename: "schtasks"; \
     Parameters: "/Create /F /SC ONLOGON /RL HIGHEST /RU SYSTEM /TN ""Screentime Webserver"" /TR ""'{app}\webserver\cs-webserver.exe'"""; \
+    Flags: runhidden
+    
+Filename: "powershell.exe"; \
+    Parameters: "-ExecutionPolicy Bypass -File runtask.ps1 ""{app}\webserver\cs-webserver.exe"""; \
+    WorkingDir: {app}; \
     Flags: runhidden
 
 Filename: "schtasks"; \

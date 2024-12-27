@@ -19,4 +19,9 @@
         public string path { get; set; }
         public string title { get; set; }
     }
+    public class LimitInfo
+    {
+        public Dictionary<string, string> websiteLimits { get; set; }
+        public Dictionary<string, string> appLimits { get; set; }
+    }
 }

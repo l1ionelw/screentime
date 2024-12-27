@@ -1,0 +1,20 @@
+meta {
+  name: add to limit
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:6125/limits/add/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "type": "website",
+    "path": "www.google.com",
+    "allowHours": 23,
+    "allowMinutes": 5
+  }
+}
