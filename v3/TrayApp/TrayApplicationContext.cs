@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using Serilog;
 using TrayApp.Properties;
 
 namespace TrayApp
@@ -37,9 +33,20 @@ namespace TrayApp
                 }
             }
             trayIcon.Text = "Screentime";
-            appLogger.log("Application init");
+            Log.Information("Application Init");
             Console.WriteLine("Starting window event listener");
-            new WinhookHandler();
+            try
+            {
+                new WinhookHandler();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex.ToString());
+                Log.Fatal(ex.StackTrace);
+                Log.Fatal(ex.Message);
+                return;
+            }
+            
             
         }
         void Exit(object? sender, EventArgs e)

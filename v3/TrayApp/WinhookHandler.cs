@@ -4,17 +4,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Net.Http;
+using Serilog;
 
 
 namespace TrayApp
 {
     public class WinhookHandler
     {
-        static FileLogger appLogger = new FileLogger("trayapplog.txt", "ScreenTime");
         private static readonly HttpClient client = new HttpClient() { Timeout=TimeSpan.FromSeconds(5) };
 
         #region imports 
-        WinEventDelegate dele = null;
+        static WinEventDelegate dele = null;
         delegate void WinEventDelegate(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
 
         [DllImport("user32.dll")]
@@ -46,17 +46,17 @@ namespace TrayApp
                 {
                     // Send a GET request to the current port
                     HttpResponseMessage response = await client.GetAsync($"http://localhost:{i}/");
-                    appLogger.log("testing port " + i);
+                    Log.Information("testing port " + i);
                     // Check if the response is successful
                     if (response.IsSuccessStatusCode)
                     {
                         string text = await response.Content.ReadAsStringAsync();
-                        appLogger.log(text);
+                        Log.Information(text);
                         if (text == "Screentime API!")
                         {
                             port = i;
                             API_URL = $"http://localhost:{i}/new/appchange/";
-                            appLogger.log($"Found open port: {i}");
+                            Log.Information($"Found open port: {i}");
                             break;  // Exit loop if a response is received
                         }
                     }
@@ -64,18 +64,53 @@ namespace TrayApp
                 catch (HttpRequestException)
                 {
                     // Ignore if no response (port is closed or unavailable)
-                    appLogger.log("Port closed at " + i);
+                    Log.Information("Port closed at " + i);
                     continue;
                 }
 
             }
         }
-            
+        public static async Task MakeApiRequestAsync(string output, string API_URL, ApplicationInfo applicationInfo)
+        {
+            using (var client = new HttpClient())
+            {
+                // Prepare the content for the request
+                var content = new StringContent(output, Encoding.UTF8, "application/json");
+
+                try
+                {
+                    // Make the POST request asynchronously
+                    HttpResponseMessage response = await client.PostAsync(API_URL, content);
+
+                    // Log the application path
+                    Log.Information("Previous: " + applicationInfo.path);
+
+                    // Read and print the response content asynchronously
+                    string responseContent = await response.Content.ReadAsStringAsync();
+                    Log.Information($"Response: {responseContent}");
+                }
+                catch (Exception ex)
+                {
+                    // Log any exceptions that occur during the request
+                    Log.Error($"Error: {ex.Message}");
+                }
+            }
+        }
+        static ApplicationInfo checkApplicationInfo(ApplicationInfo applicationInfo)
+        {
+            applicationInfo.fileDescription = applicationInfo.fileDescription ?? "UNKNOWN_FILEDESCRIPTION";
+            applicationInfo.path = applicationInfo.path ?? "UNKNOWN_PATH";
+            applicationInfo.productName = applicationInfo.productName ?? "UNKNOWN_PRODUCTNAME";
+            return applicationInfo;
+        }
+
+
         public async void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
             endTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             // generate data for previous app
             ApplicationInfo applicationInfo = new ApplicationInfo() { fileDescription=appinfo.fileDescription, path=appinfo.path,  productName=appinfo.productName};
+            applicationInfo = checkApplicationInfo(applicationInfo);
             JsonPostData postData = new JsonPostData() { appInfo=applicationInfo, appPath=appinfo.path, endTime=endTime, startTime=startTime };
             // new app and tab times
             string output = JsonConvert.SerializeObject(postData);
@@ -83,37 +118,18 @@ namespace TrayApp
             // if less than 1 second then skip (alt tab or shell host dialog) 
             if (endTime - startTime > 1)
             {
-                using (HttpClient client = new HttpClient())
-                {
-                    // Prepare the content
-                    StringContent content = new StringContent(output, Encoding.UTF8, "application/json");
-
-                    try
-                    {
-                        // Make the POST request asynchronously
-                        HttpResponseMessage response = await client.PostAsync(API_URL, content);
-                        appLogger.log("Previous: " + applicationInfo.path);
-
-                        // Read and print the response content
-                        string responseContent = await response.Content.ReadAsStringAsync();
-                        appLogger.log($"Response: {responseContent}");
-                    }
-                    catch (Exception ex)
-                    {
-                        appLogger.log($"Error: {ex.Message}");
-                    }
-                }
+                Task.Run(async () =>  MakeApiRequestAsync(output, API_URL, applicationInfo));
             }
             startTime = endTime;
             appinfo = WindowManager.getWindowTitle();
-            appLogger.log("Current App: " + appinfo.path);
+            Log.Information("Current App: " + appinfo.path);
         }
         #endregion
         public WinhookHandler()
         {
-            appLogger.log("Window hook initialized");
+            Log.Information("Window hook initialized");
             Task.Run(async () => await setApiUrl()).GetAwaiter().GetResult();
-            appLogger.log(API_URL);
+            Log.Information(API_URL);
             dele = new WinEventDelegate(WinEventProc);
             IntPtr m_hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, dele, 0, 0, WINEVENT_OUTOFCONTEXT);
             // SystemEvents.PowerModeChanged += OnPowerChange;

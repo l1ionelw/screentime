@@ -60,14 +60,16 @@ namespace TrayApp
             hWnd = GetForegroundWindow();
 
             if (hWnd == IntPtr.Zero)
-                return null;
+                return "UNKNOWN_FILEPATH";
+                //return null;
 
             uint pID;
             GetWindowThreadProcessId(hWnd, out pID);
 
             IntPtr proc;
             if ((proc = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, false, (int)pID)) == IntPtr.Zero)
-                return null;
+                return "UNKNOWN_FILEPATH";
+                //return null;
 
             int capacity = 2000;
             StringBuilder sb = new StringBuilder(capacity);
@@ -109,7 +111,8 @@ namespace TrayApp
 
             IntPtr proc;
             if ((proc = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, false, (int)windowinfo.childpid)) == IntPtr.Zero)
-                return null;
+                return "UNKNOWN_FILEPATH";
+                // return null;
 
             int capacity = 2000;
             StringBuilder sb = new StringBuilder(capacity);

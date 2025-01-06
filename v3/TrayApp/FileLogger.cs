@@ -14,7 +14,7 @@ namespace TrayApp
             Console.WriteLine(content);
             DateTime now = DateTime.Now;
             string logPrefix = "["+now.ToString("MM-dd-yyyy HH:mm:ss")+"] " + content;
-            writeToFile(logPrefix);
+            // writeToFile(logPrefix);
         }
         private void writeToFile(string content)
         {

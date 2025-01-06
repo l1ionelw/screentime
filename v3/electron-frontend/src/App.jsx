@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {DateTime, Duration} from "luxon";
+import {DateTime} from "luxon";
 import ScreenTimeLogo from "@/assets/ScreenTimeLogo.jsx";
 import {useApiPort} from "@/contexts/ApiPortContext.jsx";
 import {calculateAppUsageTimes} from "@/utils/calculateAppUsageTimes.js";
@@ -15,6 +15,7 @@ import {secondsFormatter} from "@/utils/secondsFormatter.js";
 import {produce} from "immer";
 import {calculateBrowserUsageTimes} from "@/utils/calculateBrowserUsageTimes.js";
 import {filterBrowserUsageTimes} from "@/utils/filterBrowserUsageTimes.js";
+import AppLimitsUI from "@/components/custom/AppLimitsUI.jsx";
 
 
 const appUsageTimesChartConfig = {
@@ -78,118 +79,120 @@ export default function App() {
                                onClick={() => setSelectedTab("Settings")}>Settings</a>
                         </div>
 
-
-                        <div className={"flex gap-x-5 items-center"}>
-                            <h1>Apps</h1>
-                            <p onClick={() => {
-                                setDataViewMode(produce(draft => {
-                                    draft.screenTime = `${dataViewMode.screenTime === "Bar" ? "List" : "Bar"}`
-                                }))
-                            }}
-                               style={{backgroundColor: "darkgray", borderRadius: 5, cursor: "pointer"}}
-                               className={"p-1"}>{dataViewMode.screenTime === "Bar" ? "Show list" : "Show chart"}</p>
-                        </div>
                         {selectedTab === "Usage" && <div>
-                            {dataViewMode.screenTime === "Bar" && <ResponsiveContainer width={"80%"}>
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Bar Chart</CardTitle>
-                                        <CardDescription>January - June 2024</CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <ChartContainer config={appUsageTimesChartConfig}>
-                                            <BarChart accessibilityLayer data={appScreenTimes} layout={"vertical"}>
-                                                <YAxis
-                                                    dataKey="app"
-                                                    type={"category"}
-                                                    tickLine={false}
-                                                    tickMargin={10}
-                                                    axisLine={false}
-                                                />
-                                                <Bar dataKey="usage" fill="var(--color-desktop)" radius={8}/>
-                                                <ChartTooltip
-                                                    cursor={false}
-                                                    content={<ChartTooltipContent
-                                                        formatter={(value, name, item, index) => (
-                                                            <div className={"ml-4"}>
-                                                                <p>Usage: {secondsFormatter(item.payload.usage)}</p>
-                                                                <p>Path: {item.payload.path}</p>
-                                                            </div>
-                                                        )}/>}
-                                                />
-                                            </BarChart>
-                                        </ChartContainer>
-                                    </CardContent>
-                                </Card>
-                            </ResponsiveContainer>}
-                            {dataViewMode.screenTime === "List" && <div style={{marginLeft: 10, marginRight: 10}}>
-                                {appScreenTimes.map((object) => (
-                                    <div key={object.app}>
-                                        <p>{object.app}</p>
-                                        <p>{object.path}</p>
-                                        <p>{secondsFormatter(object.usage)}</p>
-                                        <hr/>
-                                    </div>
-                                ))}
-                            </div>}
+                            <div className={"flex gap-x-5 items-center"}>
+                                <h1>Apps</h1>
+                                <p onClick={() => {
+                                    setDataViewMode(produce(draft => {
+                                        draft.screenTime = `${dataViewMode.screenTime === "Bar" ? "List" : "Bar"}`
+                                    }))
+                                }}
+                                   style={{backgroundColor: "darkgray", borderRadius: 5, cursor: "pointer"}}
+                                   className={"p-1"}>{dataViewMode.screenTime === "Bar" ? "Show list" : "Show chart"}</p>
+                            </div>
+                            <div>
+                                {dataViewMode.screenTime === "Bar" && <ResponsiveContainer width={"80%"}>
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>Bar Chart</CardTitle>
+                                            <CardDescription>January - June 2024</CardDescription>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <ChartContainer config={appUsageTimesChartConfig}>
+                                                <BarChart accessibilityLayer data={appScreenTimes} layout={"vertical"}>
+                                                    <YAxis
+                                                        dataKey="app"
+                                                        type={"category"}
+                                                        tickLine={false}
+                                                        tickMargin={10}
+                                                        axisLine={false}
+                                                    />
+                                                    <Bar dataKey="usage" fill="var(--color-desktop)" radius={8}/>
+                                                    <ChartTooltip
+                                                        cursor={false}
+                                                        content={<ChartTooltipContent
+                                                            formatter={(value, name, item, index) => (
+                                                                <div className={"ml-4"}>
+                                                                    <p>Usage: {secondsFormatter(item.payload.usage)}</p>
+                                                                    <p>Path: {item.payload.path}</p>
+                                                                </div>
+                                                            )}/>}
+                                                    />
+                                                </BarChart>
+                                            </ChartContainer>
+                                        </CardContent>
+                                    </Card>
+                                </ResponsiveContainer>}
+                                {dataViewMode.screenTime === "List" && <div style={{marginLeft: 10, marginRight: 10}}>
+                                    {appScreenTimes.map((object) => (
+                                        <div key={object.app}>
+                                            <p>{object.app}</p>
+                                            <p>{object.path}</p>
+                                            <p>{secondsFormatter(object.usage)}</p>
+                                            <hr/>
+                                        </div>
+                                    ))}
+                                </div>}
+                            </div>
+
+
+
+                            <div className={"flex gap-x-5 items-center"}>
+                                <h1>Browser Tabs</h1>
+                                <p onClick={() => {
+                                    setDataViewMode(produce(draft => {
+                                        draft.browserTime = `${dataViewMode.browserTime === "Bar" ? "List" : "Bar"}`
+                                    }))
+                                }}
+                                   style={{backgroundColor: "darkgray", borderRadius: 5, cursor: "pointer"}}
+                                   className={"p-1"}>{dataViewMode.browserTime === "Bar" ? "Show list" : "Show chart"}</p>
+                            </div>
+                            <div>
+                                {dataViewMode.browserTime === "Bar" && <ResponsiveContainer width={"80%"}>
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>Bar Chart</CardTitle>
+                                            <CardDescription>January - June 2024</CardDescription>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <ChartContainer config={appUsageTimesChartConfig}>
+                                                <BarChart accessibilityLayer data={appScreenTimes} layout={"vertical"}>
+                                                    <YAxis
+                                                        dataKey="app"
+                                                        type={"category"}
+                                                        tickLine={false}
+                                                        tickMargin={10}
+                                                        axisLine={false}
+                                                    />
+                                                    <Bar dataKey="usage" fill="var(--color-desktop)" radius={8}/>
+                                                    <ChartTooltip
+                                                        cursor={false}
+                                                        content={<ChartTooltipContent
+                                                            formatter={(value, name, item, index) => (
+                                                                <div className={"ml-4"}>
+                                                                    <p>Usage: {secondsFormatter(item.payload.usage)}</p>
+                                                                    <p>Path: {item.payload.path}</p>
+                                                                </div>
+                                                            )}/>}
+                                                    />
+                                                </BarChart>
+                                            </ChartContainer>
+                                        </CardContent>
+                                    </Card>
+                                </ResponsiveContainer>}
+                                {dataViewMode.browserTime === "List" && <div style={{marginLeft: 10, marginRight: 10}} w>
+                                    {browserScreenTimes.map((object) => (
+                                        <div key={object.path}>
+                                            <p>{object.path}</p>
+                                            <p>{object.tab}</p>
+                                            <p>{secondsFormatter(object.usage)}</p>
+                                            <hr/>
+                                        </div>
+                                    ))}
+                                </div>}
+                            </div>
                         </div>}
-
-
-
-                        <div className={"flex gap-x-5 items-center"}>
-                            <h1>Browser Tabs</h1>
-                            <p onClick={() => {
-                                setDataViewMode(produce(draft => {
-                                    draft.browserTime = `${dataViewMode.browserTime === "Bar" ? "List" : "Bar"}`
-                                }))
-                            }}
-                               style={{backgroundColor: "darkgray", borderRadius: 5, cursor: "pointer"}}
-                               className={"p-1"}>{dataViewMode.browserTime === "Bar" ? "Show list" : "Show chart"}</p>
-                        </div>
-                        {selectedTab === "Usage" && <div>
-                            {dataViewMode.browserTime === "Bar" && <ResponsiveContainer width={"80%"}>
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Bar Chart</CardTitle>
-                                        <CardDescription>January - June 2024</CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <ChartContainer config={appUsageTimesChartConfig}>
-                                            <BarChart accessibilityLayer data={appScreenTimes} layout={"vertical"}>
-                                                <YAxis
-                                                    dataKey="app"
-                                                    type={"category"}
-                                                    tickLine={false}
-                                                    tickMargin={10}
-                                                    axisLine={false}
-                                                />
-                                                <Bar dataKey="usage" fill="var(--color-desktop)" radius={8}/>
-                                                <ChartTooltip
-                                                    cursor={false}
-                                                    content={<ChartTooltipContent
-                                                        formatter={(value, name, item, index) => (
-                                                            <div className={"ml-4"}>
-                                                                <p>Usage: {secondsFormatter(item.payload.usage)}</p>
-                                                                <p>Path: {item.payload.path}</p>
-                                                            </div>
-                                                        )}/>}
-                                                />
-                                            </BarChart>
-                                        </ChartContainer>
-                                    </CardContent>
-                                </Card>
-                            </ResponsiveContainer>}
-                            {dataViewMode.browserTime === "List" && <div style={{marginLeft: 10, marginRight: 10}} w>
-                                {browserScreenTimes.map((object) => (
-                                    <div key={object.path}>
-                                        <p>{object.path}</p>
-                                        <p>{object.tab}</p>
-                                        <p>{secondsFormatter(object.usage)}</p>
-                                        <hr/>
-                                    </div>
-                                ))}
-                            </div>}
-                        </div>}
+                        {selectedTab === "Limits" && <AppLimitsUI/>}
 
 
                     </div>

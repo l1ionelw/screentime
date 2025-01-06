@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Principal;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using Serilog;
+using Serilog.Events;
+using Serilog.Formatting.Json;
 
 namespace TrayApp
 {
@@ -18,6 +18,7 @@ namespace TrayApp
         [STAThread]
         static void Main(string[] args)
         {
+
             string userSid = WindowsIdentity.GetCurrent().User?.Value;
             string mutexName = $"Global\\ScreenTimeTrayApp_{userSid}";
             bool createdNew;
@@ -28,6 +29,20 @@ namespace TrayApp
                 return;
             }
             // MessageBox.Show(APPDATA_DIR_NAME + " is NOT running, starting new instance!", "Multiple Instances");
+            string logFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ScreenTime\\trayapplog.json");
+            Log.Logger = new LoggerConfiguration()
+                            // add console as logging target
+                            .WriteTo.Console()
+                            // add a logging target for warnings and higher severity  logs
+                            // structured in JSON format
+                            .WriteTo.File(new JsonFormatter(),
+                                          logFilePath,
+                                          restrictedToMinimumLevel: LogEventLevel.Debug)
+                            // set default minimum level
+                            .MinimumLevel.Debug()
+                            .CreateLogger();
+
+
             checkAppDataFolder();
             Application.EnableVisualStyles();
             Console.WriteLine("Trayapp is starting");

@@ -5,13 +5,17 @@ using System.Net.NetworkInformation;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using cs_webserver;
+using Serilog.Events;
+using Serilog.Formatting.Json;
+using Serilog;
+using Microsoft.AspNetCore.Mvc;
 
 class Program
 {
     public static string commonPath = Path.GetFullPath(Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), @"..\"));
-
+    public static string logFilePath = Path.Combine(commonPath, "ScreenTime\\serverlog.json");
     public static string APPDATA_DIR_PATH = Path.Combine(commonPath, "ScreenTime");
-    static AppLogger logger = new AppLogger("serverlog.txt", APPDATA_DIR_PATH);
+    // static AppLogger logger = new AppLogger("serverlog.txt", APPDATA_DIR_PATH);
     static ScreenTimeStore allStore = new ScreenTimeStore();
     static DateTime CURRENT_DAY = DateTime.Now;
     static int FILESAVE_TIMER_SECONDS = 300;
@@ -28,13 +32,26 @@ class Program
         string mutexString = "Global\\ScreenTimeServer";
         Mutex m = new Mutex(true, mutexString, out createdNew);
 
+        Log.Logger = new LoggerConfiguration()
+                            // add console as logging target
+                            .WriteTo.Console()
+                            // add a logging target for warnings and higher severity  logs
+                            // structured in JSON format
+                            .WriteTo.File(new JsonFormatter(),
+                                          logFilePath,
+                                          restrictedToMinimumLevel: LogEventLevel.Debug)
+                            // set default minimum level
+                            .MinimumLevel.Debug()
+                            .CreateLogger();
+
         if (!createdNew)
         {
-            logger.Log("A GLOBAL INSTANCE IS ALREADY RUNNING! TERMINATING!");
+            Log.Error("A GLOBAL INSTANCE IS ALREADY RUNNING! TERMINATING!");
             return;
         }
+        
         checkAppDataFolder(APPDATA_DIR_PATH);
-        logger.Log("APPLICATION INIT");
+        Log.Information("APPLICATION INIT");
         allStore = new ScreenTimeStore()
         {
             appHistory = new Dictionary<string, List<string>>(),
@@ -43,18 +60,18 @@ class Program
             tabPairs = new Dictionary<string, TabInfo>(),
 
         };
-        logger.Log("Checking for another entry from today");
+        Log.Information("Checking for another entry from today");
         string currentFileName = generateAppDataFilePath(generateFileNameFromDate(CURRENT_DAY));
         if (File.Exists(currentFileName))
         {
-            logger.Log("entry exists, taking data from session");
+            Log.Information("entry exists, taking data from session");
             setStoreFromFile(currentFileName);
         }
-        logger.Log("-------");
+        Log.Information("-------");
         // logger.Log(JsonSerializer.Serialize(allStore));
-        logger.Log("-------");
-        logger.Log("Store initialization finished!");
-        logger.Log("Webserver: Finding free port");
+        Log.Information("-------");
+        Log.Information("Store initialization finished!");
+        Log.Information("Webserver: Finding free port");
         int APPLICATION_PORT = getFreePort();
         
         var builder = WebApplication.CreateBuilder(args);
@@ -161,6 +178,8 @@ class Program
 
         app.MapPost("/limits/add/", (LimitData data) =>
         {
+            Debug.WriteLine(" in here");
+            Debug.WriteLine(JsonSerializer.Serialize(data));
             // validate hours and minutes are valid
             if (data.allowHours < 0 || data.allowMinutes < 0 || data.allowHours >= 24 || data.allowMinutes > 60)
             {
@@ -179,25 +198,39 @@ class Program
             }
             // if exists, change value, otherwise append new entry
             string timeLimitString = data.allowHours.ToString() + "|" + data.allowMinutes.ToString();
-            if (data.type == "website")
+            if (data.type == "Website")
             {
                 if (limits.websiteLimits.ContainsKey(data.path)) limits.websiteLimits[data.path] = timeLimitString;
                 else limits.websiteLimits.Add(data.path, timeLimitString);
             }
-            if (data.type == "app")
+            else if (data.type == "App")
             {
                 if (limits.appLimits.ContainsKey(data.path)) limits.websiteLimits[data.path] = timeLimitString;
                 else limits.appLimits.Add(data.path, timeLimitString);
+            } else
+            {
+                Debug.WriteLine("category mismatch");
+                return Results.Problem("CATEGORY MISMATCH");
             }
             // write back to json
             File.WriteAllText(timeLimitsFilePath, JsonSerializer.Serialize(limits, serializerIgnoreNull));
             return Results.Ok();
         });
 
-        logger.Log("App started on port: " + APPLICATION_PORT);
+        Log.Information("App started on port: " + APPLICATION_PORT);
 
         initializeFileBackupTimer();
-        app.Run();
+        try
+        {
+            app.Run();
+        } catch (Exception e)
+        {
+            Log.Fatal("AN ERROR OCCURRED");
+            Log.Fatal(e.ToString());
+            Log.Fatal(e.Message);
+            return;
+        }
+        
     }
 
 
@@ -234,26 +267,26 @@ class Program
     }
     public static async void initializeFileBackupTimer()
     {
-        logger.Log("Initializing file timer");
+        Log.Information("Initializing file timer");
         string currentDayFile = generateAppDataFilePath(generateFileNameFromDate(CURRENT_DAY));
         var timer = new PeriodicTimer(TimeSpan.FromSeconds(FILESAVE_TIMER_SECONDS));
 
         while (await timer.WaitForNextTickAsync())
         {
-            logger.Log("Periodic timer save: " + currentDayFile);
+            Log.Information("Periodic timer save: " + currentDayFile);
             File.WriteAllText(currentDayFile, JsonSerializer.Serialize(allStore, serializerIgnoreNull));
         }
     }
     public static void checkDay()
     {
-        logger.Log("Checking today is same day");
+        Log.Information("Checking today is same day");
         DateTime rightNow = DateTime.Now;
         if (CURRENT_DAY.Year != rightNow.Year || CURRENT_DAY.Month != rightNow.Month || CURRENT_DAY.Day != rightNow.Day)
         {
-            logger.Log("NOT SAME DAY");
-            logger.Log("Saving current store to json");
+            Log.Information("NOT SAME DAY");
+            Log.Information("Saving current store to json");
             File.WriteAllText(generateAppDataFilePath(generateFileNameFromDate(CURRENT_DAY)), JsonSerializer.Serialize(allStore, serializerIgnoreNull));
-            logger.Log("Erasing allstore and changing day");
+            Log.Information("Erasing allstore and changing day");
             allStore = new ScreenTimeStore()
             {
                 appHistory = new Dictionary<string, List<string>>(),
@@ -269,7 +302,7 @@ class Program
     {
         Debug.WriteLine("Backup data called");
         string currentDayFile = generateAppDataFilePath(generateFileNameFromDate(CURRENT_DAY));
-        logger.Log("Writing to file: " + currentDayFile);
+        Log.Information("Writing to file: " + currentDayFile);
         if (APP_CHANGES >= APP_CHANGE_THRESHOLD)
         {
             File.WriteAllText(currentDayFile, JsonSerializer.Serialize(allStore, serializerIgnoreNull));
@@ -293,8 +326,8 @@ class Program
         }
         catch (Exception ex)
         {
-            logger.Log("an error occurred while parsing file store! using empty allstore");
-            logger.Log(ex.Message);
+            Log.Information("an error occurred while parsing file store! using empty allstore");
+            Log.Information(ex.Message);
         }
 
     }
@@ -308,17 +341,17 @@ class Program
     }
     public static int getFreePort()
     {
-        logger.Log("Checking for open port in range 6125 - 6135 (hardcoded)");
+        Log.Information("Checking for open port in range 6125 - 6135 (hardcoded)");
         for (int i = 6125; i <= 6135; i++)
         {
             if (isPortOpen(i))
             {
-                logger.Log("This port is open: " + i);
+                Log.Information("This port is open: " + i);
                 return i;
             }
             else
             {
-                logger.Log("This port is not open: " + i);
+                Log.Information("This port is not open: " + i);
             }
         }
         return -1;
