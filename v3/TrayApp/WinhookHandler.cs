@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Net.Http;
 using Serilog;
+using Microsoft.Win32;
+using System.Windows.Forms;
 
 
 namespace TrayApp
@@ -125,6 +127,41 @@ namespace TrayApp
             Log.Information("Current App: " + appinfo.path);
         }
         #endregion
+
+        private void OnPowerModeChanged(object sender, PowerModeChangedEventArgs e)
+        {
+            switch (e.Mode)
+            {
+                case PowerModes.Resume:
+                    Log.Information("System has resumed from sleep.");
+                    break;
+                case PowerModes.Suspend:
+                    Log.Information("System is going into sleep mode.");
+                    endTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                    ApplicationInfo applicationInfo = new ApplicationInfo() { fileDescription = appinfo.fileDescription, path = appinfo.path, productName = appinfo.productName };
+                    applicationInfo = checkApplicationInfo(applicationInfo);
+                    JsonPostData postData = new JsonPostData() { appInfo = applicationInfo, appPath = appinfo.path, endTime = endTime, startTime = startTime };
+                    // new app and tab times
+                    string output = JsonConvert.SerializeObject(postData);
+
+                    // if less than 1 second then skip (alt tab or shell host dialog) 
+                    if (endTime - startTime > 1)
+                    {
+                        Task.Run(async () => MakeApiRequestAsync(output, API_URL, applicationInfo));
+                    }
+                    startTime = endTime;
+                    appinfo = new ApplicationInfo() { fileDescription = "WINDOWS_SLEEP", path = "WINDOWS_SLEEP", productName = "WINDOWS_SLEEP" };
+                    Log.Information("Current App: " + appinfo.path);
+                    break;
+                case PowerModes.StatusChange:
+                    Log.Information("Power status has changed.");
+                    break;
+                default:
+                    Log.Information("Unknown power mode change detected.");
+                    break;
+            }
+        }
+
         public WinhookHandler()
         {
             Log.Information("Window hook initialized");
@@ -132,7 +169,8 @@ namespace TrayApp
             Log.Information(API_URL);
             dele = new WinEventDelegate(WinEventProc);
             IntPtr m_hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, dele, 0, 0, WINEVENT_OUTOFCONTEXT);
-            // SystemEvents.PowerModeChanged += OnPowerChange;
+            SystemEvents.PowerModeChanged += OnPowerModeChanged;
+                ;
         }
     }
 }
