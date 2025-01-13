@@ -193,6 +193,7 @@ class Program
                 websiteLimits = new Dictionary<string, string>()
             };
             if (File.Exists(timeLimitsFilePath))
+            if (File.Exists(timeLimitsFilePath))
             {
                 limits = JsonSerializer.Deserialize<LimitInfo>(File.ReadAllText(timeLimitsFilePath));
             }
