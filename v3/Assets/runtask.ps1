@@ -1,6 +1,6 @@
 $executableFilePath = $args[0]
-$taskname = "1Screentime Webserver"
-$taskdescription = "meow meow meow meow"
+$taskname = "Screentime Webserver"
+$taskdescription = "runs screentime's webserver"
 $action = New-ScheduledTaskAction -Execute $executableFilePath
 $trigger = New-ScheduledTaskTrigger -AtLogon
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit 0

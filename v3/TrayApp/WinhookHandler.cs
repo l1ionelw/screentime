@@ -6,7 +6,9 @@ using Newtonsoft.Json;
 using System.Net.Http;
 using Serilog;
 using Microsoft.Win32;
-using System.Windows.Forms;
+using TrayApp.Properties;
+using System.Security.Cryptography.X509Certificates;
+using System.IO;
 
 
 namespace TrayApp
@@ -37,6 +39,9 @@ namespace TrayApp
         ApplicationInfo appinfo = WindowManager.getWindowTitle();
         long startTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         long endTime;
+        static int NUM_REQUEST_TIMEOUT = 0;
+        string username = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+        WindowOverlay overlay = new WindowOverlay();
 
         public async Task setApiUrl ()
         {
@@ -90,13 +95,30 @@ namespace TrayApp
                     // Read and print the response content asynchronously
                     string responseContent = await response.Content.ReadAsStringAsync();
                     Log.Information($"Response: {responseContent}");
+                    NUM_REQUEST_TIMEOUT = 0;
                 }
                 catch (Exception ex)
                 {
                     // Log any exceptions that occur during the request
                     Log.Error($"Error: {ex.Message}");
+                    NUM_REQUEST_TIMEOUT++;
                 }
+                updateIconOnServerStatus();
             }
+        }
+
+        public static void updateIconOnServerStatus()
+        {
+            if (NUM_REQUEST_TIMEOUT >= 5)
+            {
+                TrayApplicationContext.trayIcon.Icon = Resources.AppIconWarning;
+                TrayApplicationContext.trayIcon.Text = "Screentime Error! Server not found";
+                return;
+            }
+            TrayApplicationContext.trayIcon.Icon = Resources.AppIcon;
+            TrayApplicationContext.trayIcon.Text = "Screentime Tray App";
+            return;
+
         }
         static ApplicationInfo checkApplicationInfo(ApplicationInfo applicationInfo)
         {
@@ -106,14 +128,13 @@ namespace TrayApp
             return applicationInfo;
         }
 
-
         public async void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
             endTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             // generate data for previous app
             ApplicationInfo applicationInfo = new ApplicationInfo() { fileDescription=appinfo.fileDescription, path=appinfo.path,  productName=appinfo.productName};
             applicationInfo = checkApplicationInfo(applicationInfo);
-            JsonPostData postData = new JsonPostData() { appInfo=applicationInfo, appPath=appinfo.path, endTime=endTime, startTime=startTime };
+            JsonPostData postData = new JsonPostData() { appInfo=applicationInfo, appPath=appinfo.path, endTime=endTime, startTime=startTime, username=username };
             // new app and tab times
             string output = JsonConvert.SerializeObject(postData);
             
@@ -124,6 +145,7 @@ namespace TrayApp
             }
             startTime = endTime;
             appinfo = WindowManager.getWindowTitle();
+            overlay.UpdateText(Path.GetFileName(appinfo.path));
             Log.Information("Current App: " + appinfo.path);
         }
         #endregion
@@ -167,10 +189,11 @@ namespace TrayApp
             Log.Information("Window hook initialized");
             Task.Run(async () => await setApiUrl()).GetAwaiter().GetResult();
             Log.Information(API_URL);
+            Log.Information(username);
             dele = new WinEventDelegate(WinEventProc);
             IntPtr m_hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, dele, 0, 0, WINEVENT_OUTOFCONTEXT);
-            SystemEvents.PowerModeChanged += OnPowerModeChanged;
-                ;
+            SystemEvents.PowerModeChanged += OnPowerModeChanged;;
+            overlay.Show();
         }
     }
 }

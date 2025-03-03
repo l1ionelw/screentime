@@ -19,11 +19,10 @@ export function calculateAppUsageTimes(allStore) {
             appToAppend.usage += timeElapsedSeconds;
             usageList.push(timeElapsedSeconds);
         }
-        console.log(appToAppend);
-        console.log(usageList);
-        removeConsecutiveDuplicates(usageList);
         appTimes.push(appToAppend);
     }
+    console.log(("APP TIMES-----"))
+    console.log(appTimes)
     return appTimes;
 }
 

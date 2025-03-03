@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 using Serilog;
@@ -8,17 +10,19 @@ namespace TrayApp
 {
     public class TrayApplicationContext : ApplicationContext
     {
-        static FileLogger appLogger = new FileLogger("trayapplog.txt", "ScreenTime");
-        private NotifyIcon trayIcon;
+        public static NotifyIcon trayIcon { get; set; }
 
         public TrayApplicationContext(string[] args)
         {
             trayIcon = new NotifyIcon()
             {
-                Icon = Resources.AppIcon,
+                Icon = Resources.AppIconWarning,
                 ContextMenuStrip = new ContextMenuStrip()
                 {
-                    Items = { new ToolStripMenuItem("Exit", null, Exit) }
+                    Items = {
+                        new ToolStripMenuItem("Open Log File", null, openFolder),
+                        new ToolStripMenuItem("Exit", null, Exit)
+                    }
                 },
                 Visible = true
             };
@@ -28,13 +32,17 @@ namespace TrayApp
                 if (args[0] == "--delayedStart" || args[0] == "--delayStart" || args[0] == "delayedStart" || args[0] == "delayStart")
                 {
                     trayIcon.Text = "Screentime - Waiting for server";
-                    appLogger.log("delaying start");
+                    Log.Information("delaying start");
                     Thread.Sleep(10000); // wait 10 sec
                 }
             }
-            trayIcon.Text = "Screentime";
+            // trayIcon.Text = "Screentime Tray App";
+            trayIcon.Text = "Screentime Error! Server not found";
+            Thread.Sleep(10000);
+
             Log.Information("Application Init");
             Console.WriteLine("Starting window event listener");
+
             try
             {
                 new WinhookHandler();
@@ -48,6 +56,12 @@ namespace TrayApp
             }
             
             
+            
+        }
+        void openFolder(object? sender, EventArgs e)
+        {
+            string trayAppLogPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ScreenTime");
+            Process.Start("explorer.exe", "/open, " + trayAppLogPath);
         }
         void Exit(object? sender, EventArgs e)
         {

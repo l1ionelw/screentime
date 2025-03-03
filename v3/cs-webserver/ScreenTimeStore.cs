@@ -2,6 +2,7 @@
 {
     public class ScreenTimeStore
     {
+        public string user { get; set; }
         public Dictionary<string, List<string>> appHistory { get; set; }
         public Dictionary<string, List<string>> tabHistory { get; set; }
         public Dictionary<string, AppInfo> appPairs { get; set; }

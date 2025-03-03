@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -8,7 +7,7 @@ using cs_webserver;
 using Serilog.Events;
 using Serilog.Formatting.Json;
 using Serilog;
-using Microsoft.AspNetCore.Mvc;
+using System.IO;
 
 class Program
 {
@@ -23,11 +22,15 @@ class Program
     static int TAB_CHANGE_THRESHOLD = 5;
     static int APP_CHANGES = 0;
     static int TAB_CHANGES = 0;
+    static string TEMP_USERNAME = "SYSTEM";
     static JsonSerializerOptions serializerIgnoreNull = new JsonSerializerOptions() { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
     
 
     static void Main(string[] args)
     {
+        Updater updater = new Updater();
+        updater.checkForUpdatesSync();
+
         bool createdNew;
         string mutexString = "Global\\ScreenTimeServer";
         Mutex m = new Mutex(true, mutexString, out createdNew);
@@ -51,9 +54,10 @@ class Program
         }
         
         checkAppDataFolder(APPDATA_DIR_PATH);
-        Log.Information("APPLICATION INIT");
+        Log.Information("APPLICATION INIT v1.0.1");
         allStore = new ScreenTimeStore()
         {
+            user = TEMP_USERNAME,
             appHistory = new Dictionary<string, List<string>>(),
             tabHistory = new Dictionary<string, List<string>>(),
             appPairs = new Dictionary<string, AppInfo>(),
@@ -68,7 +72,6 @@ class Program
             setStoreFromFile(currentFileName);
         }
         Log.Information("-------");
-        // logger.Log(JsonSerializer.Serialize(allStore));
         Log.Information("-------");
         Log.Information("Store initialization finished!");
         Log.Information("Webserver: Finding free port");
@@ -98,7 +101,7 @@ class Program
 
         app.MapPost("/new/appchange/", (AppChangeData data) =>
         {
-            Debug.WriteLine(data.appPath);
+            Log.Debug(JsonSerializer.Serialize(data));
             APP_CHANGES++;
             string appEntry = data.startTime + "|" + data.endTime;
             // entry already exists, append 
@@ -234,10 +237,11 @@ class Program
         
     }
 
-
+    
     #region postRequestModels
     public class AppChangeData
     {
+        public string username { get; set; }
         public long startTime { get; set; }
         public long endTime { get; set; }
         public string appPath { get; set; }
@@ -259,6 +263,21 @@ class Program
     }
     #endregion
     #region utils
+// New method to load default configuration
+    private static Config LoadDefaultConfig(string defaultConfigFilePath)
+    {
+        if (File.Exists(defaultConfigFilePath))
+        {
+            string defaultConfigJson = File.ReadAllText(defaultConfigFilePath);
+            return JsonSerializer.Deserialize<Config>(defaultConfigJson) ?? new Config();
+        }
+        else
+        {
+            Log.Error("Default configuration file not found. Initializing with empty config.");
+            return new Config(); // Return a default config object
+        }
+    }
+
     public static void checkAppDataFolder(string targetDirectory)
     {
         if (!Directory.Exists(targetDirectory))
@@ -290,6 +309,7 @@ class Program
             Log.Information("Erasing allstore and changing day");
             allStore = new ScreenTimeStore()
             {
+                user = TEMP_USERNAME,
                 appHistory = new Dictionary<string, List<string>>(),
                 tabHistory = new Dictionary<string, List<string>>(),
                 appPairs = new Dictionary<string, AppInfo>(),

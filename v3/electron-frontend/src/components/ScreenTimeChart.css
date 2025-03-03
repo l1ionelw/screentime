@@ -1,0 +1,22 @@
+.chart-container {
+    height: 50vh; /* Set height to 50% of the viewport height */
+    padding: 20px; /* Default padding */
+    background-color: rgba(30, 30, 30, 0.7);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    margin: 10px 0;
+    display: flex; /* Ensure it can grow and shrink */
+    flex-direction: column; /* Allow for vertical alignment */
+}
+
+@media (max-width: 768px) {
+    .chart-container {
+        height: 40vh; /* Adjust height for smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .chart-container {
+        height: 30vh; /* Further adjust height for very small screens */
+    }
+} 

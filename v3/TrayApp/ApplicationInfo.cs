@@ -14,6 +14,7 @@ namespace TrayApp
     }
     public struct JsonPostData
     {
+        public string username;
         public long startTime;
         public long endTime;
         public string appPath;

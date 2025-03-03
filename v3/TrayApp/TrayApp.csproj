@@ -194,6 +194,9 @@
     <Compile Include="TrayApplicationContext.cs" />
     <Compile Include="UwpUtils.cs" />
     <Compile Include="WindowManager.cs" />
+    <Compile Include="WindowOverlay.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="WinhookHandler.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -224,6 +227,7 @@
   <ItemGroup>
     <Content Include="Assets\logo.ico" />
     <Content Include="Properties\ScreenTime.png" />
+    <Content Include="Resources\AppIconWarning.ico" />
     <None Include="Resources\AppIcon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

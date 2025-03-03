@@ -45,6 +45,7 @@ namespace TrayApp
 
             checkAppDataFolder();
             Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
             Console.WriteLine("Trayapp is starting");
             Console.WriteLine("Running tray entrypoint");
             Application.Run(new TrayApplicationContext(args));
