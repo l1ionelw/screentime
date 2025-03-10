@@ -50,6 +50,102 @@ namespace cs_webserver
                 }
             }
         }
+        public void startPowershellUpdate(string exeFileName)
+        {
+            bool serverContactSuccess = false;
+            string downloadDestination = Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), @"..")) + "\\ScreenTime\\" + exeFileName;
+            string downloadUrl = UPDATER_SERVER_URL + "installer/" + exeFileName;
+            // download the file
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    using (var s = client.GetStreamAsync(downloadUrl))
+                    {
+                        using (var fs = new FileStream(downloadDestination, FileMode.OpenOrCreate))
+                        {
+                            s.Result.CopyTo(fs);
+                        }
+                    }
+                    Debug.WriteLine("finished download!");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Error with download.");
+                    Debug.WriteLine($"{ex.Message}");
+                    return;
+                }
+            }
+            try
+            {
+                Debug.WriteLine("starting powershell script in a seperate process");
+                var programFilesUninstallFile = Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "ScreenTime\\unins000.exe"));
+                CreateHiddenDetachedProcess(programFilesUninstallFile, downloadDestination, true);
+            } catch (Exception ex)
+            {
+                Console.WriteLine("Error in powershell update");
+            }
+        }
+        static void CreateHiddenDetachedProcess(string uninstallExePath, string installExePath, bool debug)
+        {
+            Debug.WriteLine(uninstallExePath);
+            Debug.WriteLine(installExePath);
+            // Validate paths
+            if (!File.Exists(uninstallExePath))
+            {
+                Debug.WriteLine("uninstall file not found", uninstallExePath);
+                throw new FileNotFoundException("Uninstall executable not found", uninstallExePath);
+            }
+
+            if (!File.Exists(installExePath))
+            {
+                Debug.WriteLine("install file not found", installExePath);
+                throw new FileNotFoundException("Install executable not found", installExePath);
+            }
+
+            // Create the batch file with installation commands using full paths
+            string batchFilePath = Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), @"..")) + "\\ScreenTime\\update.bat";
+            Debug.WriteLine(batchFilePath);
+            var commandsToWrite = "";
+            commandsToWrite += $"start /wait /b \"\" \"{installExePath}\" /silent  \n";
+            Debug.WriteLine(commandsToWrite);
+            try
+            {
+                File.WriteAllText(batchFilePath, commandsToWrite);
+            } catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+            
+            Debug.WriteLine("bat file finished writing to");
+
+            // Create a process to run the batch file in a completely hidden way
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = "cmd.exe",
+                Arguments = $"/c \"{batchFilePath}\"",  // /c means execute command and then terminate
+                CreateNoWindow = !debug,
+                WindowStyle = debug ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden,
+                UseShellExecute = false,
+                RedirectStandardOutput = !debug,
+                RedirectStandardError = !debug
+            };
+
+            // Start the process detached from the parent process
+            Process process = new Process { StartInfo = startInfo };
+
+            // Configure process to not be attached to parent console
+            process.EnableRaisingEvents = true;
+
+            // Start the hidden process
+            Debug.WriteLine("cmd flow starting");
+            process.Start();
+
+
+            // Detach from the process to allow it to run independently
+            Debug.WriteLine("detaching to run independent");
+            process.Dispose();
+        }
         public void update(string exeFileName)
         {
             bool serverContactSuccess = false;
@@ -82,21 +178,8 @@ namespace cs_webserver
             try
             {
                 Debug.WriteLine("starting process");
-                var programFilesUninstallFile = Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "ScreenTime\\unins000.exe"));
-
-                Debug.WriteLine(programFilesUninstallFile);
-                // check if file exists
-                if (File.Exists(programFilesUninstallFile))
-                {
-                    var uninstallProcess = Process.Start(programFilesUninstallFile, "");
-                    uninstallProcess.WaitForExit();
-                } else
-                {
-                    Debug.WriteLine("Uninstallation file doesn't exist");
-                }
-                
                 // Start the new process
-                Process.Start(downloadDestination, "");
+                Process.Start(downloadDestination, "/silent");
 
                 // Exit the current process
                 Environment.Exit(0);

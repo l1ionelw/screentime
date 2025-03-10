@@ -6,12 +6,13 @@ import { filterAppUsageTimes } from "@/utils/filterAppUsageTimes.js";
 import { convertToChartData } from "@/utils/convertToChartData.js";
 import ScreenTimeChart from "@/components/ScreenTimeChart.jsx";
 import LoadingScreen from "@/components/LoadingScreen.jsx";
-import Settings from "@/components/Settings.jsx";
 import DateNavigation from "@/components/DateNavigation.jsx";
 import TabNavigation from "@/components/TabNavigation.jsx";
 import SortDropdown from "@/components/SortDropdown.jsx";
 import AppItem from "@/components/AppItem.jsx";
 import ViewToggleButton from "@/components/ViewToggleButton.jsx";
+import GeneralSettings from "@/components/GeneralSettings.jsx";
+import OptionsPanel from "@/components/OptionsPanel.jsx";
 import "./App.css";
 import "@/styles.css";
 import AppHeader from "./components/Header";
@@ -32,7 +33,6 @@ export default function App() {
                 data.json().then((json) => {
                     setRawJsonData(json);
                     calculateChartData(json);
-                    // setBrowserScreenTimes(filterBrowserUsageTimes(calculateBrowserUsageTimes(json), 60));
                 })
             } else {
                 setRawJsonData(null);
@@ -143,7 +143,10 @@ export default function App() {
                             </div>
                         )}
                         {selectedTab === "Settings" && (
-                            <Settings />
+                            <GeneralSettings />
+                        )}
+                        {selectedTab === "OptionsPanel" && (
+                            <OptionsPanel />
                         )}
                     </div>
                 </div>

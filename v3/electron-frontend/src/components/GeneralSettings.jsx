@@ -7,7 +7,7 @@ import "@/styles.css";
  * Allows users to change the color scheme of the application
  * and saves preferences for persistence
  */
-const Settings = () => {
+const GeneralSettings = () => {
     // Get theme from context
     const { theme, setTheme, saveTheme, resetTheme, defaultTheme } = useTheme();
 
@@ -294,4 +294,4 @@ const Settings = () => {
     );
 };
 
-export default Settings; 
+export default GeneralSettings; 

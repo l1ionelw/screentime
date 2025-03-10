@@ -14,6 +14,7 @@ export const ApiPortProvider = ({ children }) => {
         // Example: Load the API_PORT from localStorage if it exists
         findOpenPort(6125, 6135).then((port)=>{
             setApiPort(port);
+            window.api.setAppPort(port);
         })
     };
 

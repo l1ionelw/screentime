@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Security.Principal;
+using System.Text.Json;
 using System.Threading;
 using System.Windows.Forms;
 using Serilog;
@@ -12,6 +13,7 @@ namespace TrayApp
     public static class Program
     {
         public static string APPDATA_DIR_NAME = "ScreenTime";
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>

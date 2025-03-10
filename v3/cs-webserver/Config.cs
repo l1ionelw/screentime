@@ -1,6 +1,6 @@
 public class Config
     {
-        public TrayApp trayapp { get; set; } = new TrayApp();
+        public TrayAppConfig trayapp { get; set; } = new TrayAppConfig();
     }
 
     public class TrayAppConfig

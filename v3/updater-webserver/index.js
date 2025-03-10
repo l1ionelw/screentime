@@ -3,8 +3,10 @@ const path = require('path');
 const app = express();
 const port = 3000;
 const versionStatus = {
-  "latest": "1.0.1",
-  "installerName": "1.0.1.exe"
+  "latest": "1.0.2",
+  "sources" : [
+    "http://localhost:3000/installer/1.0.2.exe/",
+  ]
 }
 
 // Middleware to log requests

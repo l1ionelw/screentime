@@ -29,6 +29,7 @@ LZMAUseSeparateProcess=yes
 LZMANumBlockThreads=6
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
+CloseApplications=force
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -69,3 +70,14 @@ Filename: "schtasks"; \
     Flags: runhidden
     
 Filename: "{app}\trayapp\TrayApp.exe"; Flags: nowait
+
+
+[Code]
+procedure TaskKill(fileName: String);
+var
+    resultCode: Integer;
+begin
+    Exec(ExpandConstant('taskkill.exe'), '/f /im ' + '"' + 'cs-webserver.exe' + '"', '', SW_HIDE, ewWaitUntilTerminated, resultCode);
+    Exec(ExpandConstant('taskkill.exe'), '/f /im ' + '"' + 'TrayApp.exe' + '"', '', SW_HIDE, ewWaitUntilTerminated, resultCode);
+    
+end;

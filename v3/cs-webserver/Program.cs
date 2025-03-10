@@ -24,12 +24,12 @@ class Program
     static int TAB_CHANGES = 0;
     static string TEMP_USERNAME = "SYSTEM";
     static JsonSerializerOptions serializerIgnoreNull = new JsonSerializerOptions() { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
-    
+    static Config config = new Config();
 
     static void Main(string[] args)
     {
-        Updater updater = new Updater();
-        updater.checkForUpdatesSync();
+        // Updater updater = new Updater();
+        // updater.checkForUpdatesSync();
 
         bool createdNew;
         string mutexString = "Global\\ScreenTimeServer";
@@ -52,9 +52,13 @@ class Program
             Log.Error("A GLOBAL INSTANCE IS ALREADY RUNNING! TERMINATING!");
             return;
         }
-        
+
         checkAppDataFolder(APPDATA_DIR_PATH);
         Log.Information("APPLICATION INIT v1.0.1");
+        config = LoadDefaultConfig("appconfig.json");
+        Log.Information("Config loaded: ");
+        Log.Information(JsonSerializer.Serialize(config));
+        Log.Information(config.trayapp.showwindow.ToString());
         allStore = new ScreenTimeStore()
         {
             user = TEMP_USERNAME,
@@ -76,7 +80,7 @@ class Program
         Log.Information("Store initialization finished!");
         Log.Information("Webserver: Finding free port");
         int APPLICATION_PORT = getFreePort();
-        
+
         var builder = WebApplication.CreateBuilder(args);
         builder.WebHost.ConfigureKestrel((context, serverOptions) =>
         {
@@ -97,7 +101,9 @@ class Program
 
         app.MapGet("/", () => "Screentime API!");
 
-        app.MapGet("/store/", () => JsonSerializer.Serialize(allStore,serializerIgnoreNull));
+        app.MapGet("/stop/", () => Environment.Exit(0));
+
+        app.MapGet("/store/", () => JsonSerializer.Serialize(allStore, serializerIgnoreNull));
 
         app.MapPost("/new/appchange/", (AppChangeData data) =>
         {
@@ -126,7 +132,7 @@ class Program
 
         app.MapPost("/new/tabchange/", (TabChangeData data) =>
         {
-            
+
             Debug.WriteLine(data.tabUrl);
             Debug.WriteLine(data.tabInfo);
             TAB_CHANGES++;
@@ -196,10 +202,10 @@ class Program
                 websiteLimits = new Dictionary<string, string>()
             };
             if (File.Exists(timeLimitsFilePath))
-            if (File.Exists(timeLimitsFilePath))
-            {
-                limits = JsonSerializer.Deserialize<LimitInfo>(File.ReadAllText(timeLimitsFilePath));
-            }
+                if (File.Exists(timeLimitsFilePath))
+                {
+                    limits = JsonSerializer.Deserialize<LimitInfo>(File.ReadAllText(timeLimitsFilePath));
+                }
             // if exists, change value, otherwise append new entry
             string timeLimitString = data.allowHours.ToString() + "|" + data.allowMinutes.ToString();
             if (data.type == "Website")
@@ -220,10 +226,21 @@ class Program
             File.WriteAllText(timeLimitsFilePath, JsonSerializer.Serialize(limits, serializerIgnoreNull));
             return Results.Ok();
         });
+        app.MapGet("/config/", () => JsonSerializer.Serialize(config));
+
+        app.MapPost("/config/update/", (Config data) =>
+        {
+            Debug.WriteLine("updating config!!");
+            Log.Information("updating config");
+            config = data;
+            updateConfig();
+            return Results.Ok();
+        });
 
         Log.Information("App started on port: " + APPLICATION_PORT);
 
         initializeFileBackupTimer();
+
         try
         {
             app.Run();
@@ -239,6 +256,10 @@ class Program
 
     
     #region postRequestModels
+    public class ConfigData
+    {
+        public Config newConfig { get; set; }
+    }
     public class AppChangeData
     {
         public string username { get; set; }
@@ -263,9 +284,10 @@ class Program
     }
     #endregion
     #region utils
-// New method to load default configuration
-    private static Config LoadDefaultConfig(string defaultConfigFilePath)
+    private static Config LoadDefaultConfig(string defaultConfigFileName)
     {
+        string defaultConfigFilePath = Path.Combine(APPDATA_DIR_PATH, defaultConfigFileName);
+        
         if (File.Exists(defaultConfigFilePath))
         {
             string defaultConfigJson = File.ReadAllText(defaultConfigFilePath);
@@ -275,6 +297,21 @@ class Program
         {
             Log.Error("Default configuration file not found. Initializing with empty config.");
             return new Config(); // Return a default config object
+        }
+    }
+    public static void updateConfig()
+    {
+        string configFilePath = Path.Combine(APPDATA_DIR_PATH, "appconfig.json"); // Specify the config file name
+
+        try
+        {
+            string json = JsonSerializer.Serialize(config, serializerIgnoreNull); // Serialize the config object
+            File.WriteAllText(configFilePath, json); // Write the serialized JSON to the file
+            Log.Information("Configuration updated successfully.");
+        }
+        catch (Exception ex)
+        {
+            Log.Error("An error occurred while updating the configuration: " + ex.Message);
         }
     }
 

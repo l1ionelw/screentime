@@ -9,6 +9,7 @@ using Microsoft.Win32;
 using TrayApp.Properties;
 using System.Security.Cryptography.X509Certificates;
 using System.IO;
+using System.Text.Json;
 
 
 namespace TrayApp
@@ -42,6 +43,7 @@ namespace TrayApp
         static int NUM_REQUEST_TIMEOUT = 0;
         string username = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
         WindowOverlay overlay = new WindowOverlay();
+        public static FileSystemWatcher fileWatcher;
 
         public async Task setApiUrl ()
         {
@@ -183,6 +185,46 @@ namespace TrayApp
                     break;
             }
         }
+        public void SetupFileWatcher()
+        {
+            string configFilePath = Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), @"..\", "Screentime", "appconfig.json"));
+            Log.Information("Setting up file watcher for {configFilePath}", configFilePath);
+            fileWatcher = new FileSystemWatcher(Path.GetDirectoryName(configFilePath))
+            {
+                Filter = Path.GetFileName(configFilePath),
+                NotifyFilter = NotifyFilters.LastWrite
+            };
+
+            fileWatcher.Changed += async (sender, e) =>
+            {
+                Log.Information("Config has changed");
+                if (File.Exists(configFilePath))
+                {
+                    try
+                    {
+                        string json = File.ReadAllText(configFilePath);
+                        Config config = System.Text.Json.JsonSerializer.Deserialize<Config>(json);
+                        Console.WriteLine($"trayapp.showwindow: {config.trayapp.showwindow}");
+
+                        // Show or hide the overlay based on the config value
+                        if (config.trayapp.showwindow)
+                        {
+                            overlay.Invoke((System.Windows.Forms.MethodInvoker)(() => overlay.Show())); // Show overlay on UI thread
+                        }
+                        else
+                        {
+                            overlay.Invoke((System.Windows.Forms.MethodInvoker)(() => overlay.Hide())); // Hide overlay on UI thread
+                        }
+                    }
+                    catch (IOException ex)
+                    {
+                        Log.Warning("Could not access the config file: {Message}", ex.Message);
+                    }
+                }
+            };
+
+            fileWatcher.EnableRaisingEvents = true;
+        }
 
         public WinhookHandler()
         {
@@ -193,6 +235,7 @@ namespace TrayApp
             dele = new WinEventDelegate(WinEventProc);
             IntPtr m_hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, dele, 0, 0, WINEVENT_OUTOFCONTEXT);
             SystemEvents.PowerModeChanged += OnPowerModeChanged;;
+            SetupFileWatcher();
             overlay.Show();
         }
     }

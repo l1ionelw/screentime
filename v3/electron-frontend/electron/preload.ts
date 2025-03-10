@@ -22,7 +22,11 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     // You can expose other APTs you need here.
     // ...
 })
+
 const WINDOW_API = {
     readFile: (filename: string) => ipcRenderer.invoke("readFile", filename),
+    checkTrayappStatus: () => ipcRenderer.invoke('check-trayapp-status'),
+    setAppPort: (port: number) => ipcRenderer.send('setAppPort', port),
 }
+
 contextBridge.exposeInMainWorld("api", WINDOW_API);
